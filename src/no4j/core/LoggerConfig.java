@@ -2,6 +2,8 @@ package no4j.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 public class LoggerConfig {
     /**
@@ -29,7 +31,26 @@ public class LoggerConfig {
      */
     volatile boolean includeMethod = true;
 
-    LoggerConfig() {}
+    /**
+     * The number of additional spaces counting from 0th character of the logging level's name
+     * to include in the formatted string. Minimum value: 4
+     */
+    volatile int levelPadLength = 14;
+
+    /**
+     * The number of additional spaces counting from 0th character of the method's trace
+     * to include in the formatted string. Minimum value: 23
+     */
+    volatile int methodPadLength = 30;
+
+    /**
+     * The date formatter to use for formatting the time of the log
+     */
+    volatile DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            .withZone(ZoneId.systemDefault());
+
+    LoggerConfig() {
+    }
 
     public void writeToConsole(boolean enabled) {
         writeToConsole = enabled;
@@ -57,6 +78,25 @@ public class LoggerConfig {
             }
         }
         fileOutput = logFile;
+    }
+
+    public void setLevelPadLength(int length) {
+        if (length < 4) {
+            length = 4;
+        }
+        levelPadLength = length;
+    }
+
+    public void setMethodPadLength(int length) {
+        if (length < 23) {
+            length = 23;
+        }
+        methodPadLength = length;
+    }
+    public void setFormatter(DateTimeFormatter formatter) {
+        if (formatter != null) {
+            this.formatter = formatter;
+        }
     }
 
     public void setMinStdErrLevel(Level minLevel) {

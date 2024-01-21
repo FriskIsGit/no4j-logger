@@ -154,7 +154,7 @@ public class PropertiesConfiguration {
             toLogger.inheritProperties(fromLogger);
         }
 
-        System.out.println(properties);
+        // System.out.println(properties);
         PropertiesConfiguration.config = configuration;
     }
 

@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Arrays;
 
 public class Logger {
     private final String name;
@@ -12,6 +15,9 @@ public class Logger {
     private static final Logger globalLogger = new Logger("global");
 
     LoggerConfig config = LoggerConfig.create();
+    /**
+     * Logging level to apply when logging to standard out and the log file
+     */
     Level loggingLevel = Level.OFF;
 
     Logger(String name) {
@@ -22,10 +28,17 @@ public class Logger {
         return globalLogger;
     }
 
+    /**
+     * Creates an anonymous logger. The newly created logger is not stored in the list of loggers.
+     */
     public static Logger getAnonymousLogger() {
         return new Logger(null);
     }
 
+    /**
+     * Returns a valid logger as long as the name is not null.
+     * If a logger with given name is not found, a new logger is created and returned.
+     */
     public static Logger getLogger(String name) {
         if (name == null) {
             return null;
@@ -99,12 +112,13 @@ public class Logger {
         }
         String method = "";
         if (config.includeMethod) {
+            // This is not guaranteed to work in which case method will be empty
             StackTraceElement[] stack = Thread.currentThread().getStackTrace();
             if (STACK_INDEX < stack.length) {
                 method = stack[STACK_INDEX].toString();
             }
         }
-        String output = "[" + level + "] " + method + " " + message + '\n';
+        String output = formatMessage(level, message, method);
         if (config.writeToConsole) {
             if (level.value > config.minStdErrLevel.value) {
                 System.out.print(output);
@@ -121,8 +135,30 @@ public class Logger {
                 return;
             }
         }
+    }
 
-        //System.out.println("LEVEL: " + new Object(){}.getClass().getEnclosingMethod().getName());
+    public String formatMessage(Level level, String message, String method) {
+        Instant instant = Instant.now();
+        StringBuilder format = new StringBuilder(100);
+        String levelName = level.toString();
+
+        String time = config.formatter.format(instant);
+        format.append(time);
+        format.append(' ');
+        format.append('[').append(levelName).append(']');
+        int levelPadLen = config.levelPadLength - levelName.length();
+        for (int pad = 0; pad < levelPadLen; pad++) {
+            format.append(' ');
+        }
+        format.append(method);
+        format.append(' ');
+        int methodPadLen = config.methodPadLength - method.length();
+        for (int pad = 0; pad < methodPadLen; pad++) {
+            format.append(' ');
+        }
+        format.append(message);
+        format.append('\n');
+        return format.toString();
     }
 
     public void inheritProperties(Logger logger) {
