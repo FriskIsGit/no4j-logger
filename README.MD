@@ -1,5 +1,6 @@
 # No4J
 ##  Simple logging library with sane defaults
+![Example logs](/img/logs.png)
 ### Features:
 
 - All loggers are OFF by default
