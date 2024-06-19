@@ -137,7 +137,7 @@ public class Logger {
 
     public String formatMessage(Level level, String message, String method) {
         Instant instant = Instant.now();
-        StringBuilder format = new StringBuilder(100);
+        StringBuilder format = new StringBuilder(128);
         String levelName = level.toString();
 
         String time = config.formatter.format(instant);
