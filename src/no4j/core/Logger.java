@@ -105,7 +105,7 @@ public class Logger {
     }
 
     private void logMessage(String message, Level level) {
-        if (this.loggingLevel.value == Level.OFF_VALUE || this.loggingLevel.value < level.value) {
+        if (this.loggingLevel.value == Level.OFF_VALUE || level == null || this.loggingLevel.value < level.value) {
             return;
         }
         String method = "";

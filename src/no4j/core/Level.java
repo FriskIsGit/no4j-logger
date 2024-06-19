@@ -38,6 +38,9 @@ public class Level implements Serializable {
      */
 
     public static Level custom(int value, String name) {
+        if (value <= OFF_VALUE) {
+            return null;
+        }
         return new Level(value, name);
     }
 
@@ -60,7 +63,7 @@ public class Level implements Serializable {
                 return Level.INFO;
             case 60:
                 return Level.DEBUG;
-            case 70:
+            case Integer.MAX_VALUE:
                 return Level.ALL;
             default:
                 return null;
