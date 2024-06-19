@@ -5,8 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Arrays;
 
 public class Logger {
     private final String name;
@@ -120,7 +118,7 @@ public class Logger {
         }
         String output = formatMessage(level, message, method);
         if (config.writeToConsole) {
-            if (level.value > config.minStdErrLevel.value) {
+            if (level.value > config.stdErrLevel.value) {
                 System.out.print(output);
             } else {
                 System.err.print(output);
@@ -129,7 +127,7 @@ public class Logger {
 
         if (config.writeToFile && config.fileOutput != null) {
             try {
-                Files.write(config.fileOutput.toPath(), output.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
+                Files.write(config.fileOutput, output.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND, StandardOpenOption.CREATE);
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
@@ -147,23 +145,25 @@ public class Logger {
         format.append(' ');
         format.append('[').append(levelName).append(']');
         int levelPadLen = config.levelPadLength - levelName.length();
-        for (int pad = 0; pad < levelPadLen; pad++) {
-            format.append(' ');
-        }
+        padWithSpaces(format, levelPadLen);
         format.append(method);
         format.append(' ');
         int methodPadLen = config.methodPadLength - method.length();
-        for (int pad = 0; pad < methodPadLen; pad++) {
-            format.append(' ');
-        }
+        padWithSpaces(format, methodPadLen);
         format.append(message);
         format.append('\n');
         return format.toString();
     }
 
+    private static void padWithSpaces(StringBuilder builder, int padLength) {
+        for (int i = 0; i < padLength; i++) {
+            builder.append(' ');
+        }
+    }
+
     public void inheritProperties(Logger logger) {
         this.loggingLevel = logger.loggingLevel;
-        this.config = logger.config.clone();
+        this.config = logger.config.copy();
     }
 
     @Override

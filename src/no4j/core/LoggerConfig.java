@@ -1,7 +1,7 @@
 package no4j.core;
 
 import java.io.File;
-import java.io.IOException;
+import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
@@ -19,12 +19,12 @@ public class LoggerConfig {
     /**
      * Log file object to write logs to. Null by default.
      */
-    volatile File fileOutput = null;
+    volatile Path fileOutput = null;
 
     /**
-     * Minimum level to direct output to STDERR instead of STDOUT. Level.ERROR by default.
+     * Level at or below which to direct output to STDERR instead of STDOUT. Level.ERROR by default.
      */
-    volatile Level minStdErrLevel = Level.ERROR;
+    volatile Level stdErrLevel = Level.ERROR;
 
     /**
      * Include method information where log was made. Enabled by default.
@@ -64,18 +64,15 @@ public class LoggerConfig {
         includeMethod = enabled;
     }
 
-    public void setFileOutput(File logFile) {
-        if (logFile == null) {
+    public void setOutput(File logFile) {
+        if (logFile == null || logFile.isDirectory()) {
             return;
         }
-        if (!logFile.exists()) {
-            try {
-                if (!logFile.createNewFile()) {
-                    return;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        fileOutput = logFile.toPath();
+    }
+    public void setOutput(Path logFile) {
+        if (logFile == null) {
+            return;
         }
         fileOutput = logFile;
     }
@@ -99,20 +96,20 @@ public class LoggerConfig {
         }
     }
 
-    public void setMinStdErrLevel(Level minLevel) {
-        minStdErrLevel = minLevel;
+    public void setStdErrLevel(Level minLevel) {
+        stdErrLevel = minLevel;
     }
 
     public static LoggerConfig create() {
         return new LoggerConfig();
     }
 
-    public LoggerConfig clone() {
+    public LoggerConfig copy() {
         LoggerConfig config = new LoggerConfig();
         config.writeToFile = this.writeToFile;
         config.writeToConsole = this.writeToConsole;
         config.fileOutput = this.fileOutput;
-        config.minStdErrLevel = this.minStdErrLevel;
+        config.stdErrLevel = this.stdErrLevel;
         config.includeMethod = this.includeMethod;
         return config;
     }
@@ -123,7 +120,7 @@ public class LoggerConfig {
                 "writeToConsole=" + writeToConsole +
                 ", writeToFile=" + writeToFile +
                 ", fileOutput=" + fileOutput +
-                ", minStdErrLevel=" + minStdErrLevel +
+                ", minStdErrLevel=" + stdErrLevel +
                 ", includeMethod=" + includeMethod +
                 '}';
     }

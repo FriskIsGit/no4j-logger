@@ -3,6 +3,10 @@ package no4j.core;
 import java.io.Serializable;
 import java.util.Locale;
 
+/**
+ * The {@code Level} class represents different logging levels.
+ * Level.OFF < Level.ALL
+ */
 public class Level implements Serializable {
     /**
      * This level turns off a logger.
@@ -37,23 +41,26 @@ public class Level implements Serializable {
         return new Level(value, name);
     }
 
+    /**
+     * Returns a level corresponding to its value, if not found null is returned
+     */
     public static Level toLevel(final int val) {
         switch (val) {
             case 0:
                 return OFF;
             case 1:
                 return Level.UNREACHABLE;
-            case 2:
+            case 20:
                 return Level.FATAL;
-            case 3:
+            case 30:
                 return Level.ERROR;
-            case 4:
+            case 40:
                 return Level.WARN;
-            case 5:
+            case 50:
                 return Level.INFO;
-            case 6:
+            case 60:
                 return Level.DEBUG;
-            case 7:
+            case 70:
                 return Level.ALL;
             default:
                 return null;

@@ -39,7 +39,7 @@ public class PropertiesConfiguration {
     /**
      * Initializes framework according to the properties file
      */
-    public static void configure() {
+    public static void configure() throws IOException {
         File file = new File(CONFIGURATION_FILENAME);
         if (!file.exists()) {
             file = new File("src/main/resources/" + CONFIGURATION_FILENAME);
@@ -53,13 +53,7 @@ public class PropertiesConfiguration {
             return;
         }
 
-        List<String> lines;
-        try {
-            lines = Files.readAllLines(file.toPath());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
+        List<String> lines = Files.readAllLines(file.toPath());
         PropertiesConfiguration configuration = new PropertiesConfiguration();
         HashMap<String, String> properties = readProperties(lines);
 
@@ -90,7 +84,7 @@ public class PropertiesConfiguration {
                 if (loggingLevel == null) {
                     continue;
                 }
-                logger.config.minStdErrLevel = Level.byName(value);
+                logger.config.stdErrLevel = Level.byName(value);
             }
             else if (key.endsWith(LOGGER_LEVEL)) {
                 String loggerSymbol = key.substring(0, key.length() - LOGGER_LEVEL.length());
@@ -131,7 +125,7 @@ public class PropertiesConfiguration {
                 if (logger == null) {
                     continue;
                 }
-                logger.config.setFileOutput(new File(entry.getValue()));
+                logger.config.setOutput(new File(entry.getValue()));
             }
         }
 
@@ -190,7 +184,7 @@ public class PropertiesConfiguration {
     /**
      * Resets framework and configures
      */
-    public static void reconfigure() {
+    public static void reconfigure() throws IOException {
         Logger.getGlobalLogger().setLoggingLevel(Level.OFF);
         configure();
     }
