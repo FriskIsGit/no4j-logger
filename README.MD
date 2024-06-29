@@ -11,30 +11,47 @@
 - Basic inheritance from another logger
 
 ### Configuration
-1. Create `no4j.properties` file in the root directory of the project or in `src/main/resources`
-2. Every key is followed by an equal sign and a value
-3. Every key starts with a symbolic logger name, recognized only during configuration
-4. The order of declarations or empty lines have no effect.
+- Create `no4j.properties` file in the root directory of the project or in `src/main/resources`
+- Every key starts with a `symbolic logger name`, recognized only during configuration and ends in a `key suffix` 
+- Every `key` is followed by `=` followed by `value`
+- The order of declarations or empty lines have no effect
+- Inheritance occurs once all loggers are configured
 
 ### Configuration keys:
-| Key suffix         | Underlying type |               Meaning                |
-|:-------------------|:---------------:|:------------------------------------:|
-| `.name`            |     String      |             logger name              |
-| `.inherit`         |    _string_     | symbolic logger name to inherit from |
-| `.level`           |     _Level_     |         STDOUT logging level         |
-| `.stderr.level`    |     _Level_     |         STDERR logging level         |
-| `.file.out`        |     _Path_      |            log file path             |
-| `.file.enabled`    |    _boolean_    |            write to file             |
-| `.console.enabled` |    _boolean_    |           write to console           |
+| Key suffix         |                Meaning                 |    Default value    |       Type        |
+|:-------------------|:--------------------------------------:|:-------------------:|:-----------------:|
+| `.name`            |             _logger name_              |                     |      String       |
+| `.level`           |            _logging level_             |         OFF         |       Level       |
+| `.stderr.level`    |         _STDERR logging level_         |        ERROR        |       Level       |
+| `.file.out`        |            _log file path_             |        null         |       Path        |
+| `.file.enabled`    |            _write to file_             |        false        |      boolean      |
+| `.console.enabled` |           _write to console_           |        true         |      boolean      |
+| `.date.pattern`    |         _date format pattern_          | yyyy-MM-dd HH:mm:ss | DateTimeFormatter |
+| `.date.zone`       |           _UTC/GMT/UT zone_            |        UTC+0        |      ZoneId       |
+| `.inherit`         | _symbolic logger name to inherit from_ |         N/A         |        N/A        |
 
 
 ### Example properties
 ```properties
 main.package.name = org.some.package
 main.package.level = ERROR
-main.package.file.out = main_package.log
+main.package.date.zone = UTC+6
+main.package.file.out = main.package.log
 main.package.file.enabled = true
 
 mongodb.name = org.nosql.impl
 mongodb.inherit = main.package
+```
+
+### Initialization - loading properties
+```java
+class Test {
+    public static void main(String[] args) {
+        try {
+            PropertiesConfiguration.configure();
+        } catch (IOException e) {
+            /* Handle exception */
+        }
+    }
+}
 ```

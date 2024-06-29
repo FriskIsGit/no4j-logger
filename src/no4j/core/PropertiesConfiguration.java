@@ -3,6 +3,9 @@ package no4j.core;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,10 +22,14 @@ public class PropertiesConfiguration {
     private static final String LOGGER_FILE_ENABLED = ".file.enabled"; // boolean
     private static final String LOGGER_STDERR_LEVEL = ".stderr.level"; // integer/level name
     private static final String LOGGER_FILE = ".file.out"; // file path
+    private static final String DATE_PATTERN = ".date.pattern"; // date format pattern
+    private static final String DATE_ZONE = ".date.zone"; // date zone (Instant requires zone)
 
-    private static final String LOGGER_INHERIT = ".inherit"; // existing logger name
+    private static final String LOGGER_INHERIT = ".inherit"; // existing (symbolic) logger name
 
     private static final String CONFIGURATION_FILENAME = "no4j.properties"; // file path
+
+    private static final ZoneId UTC0 = ZoneId.ofOffset("UTC", ZoneOffset.UTC);
 
     ArrayList<Logger> loggers = new ArrayList<>();
 
@@ -73,9 +80,7 @@ public class PropertiesConfiguration {
         for(HashMap.Entry<String, String> entry : properties.entrySet()) {
             String key = entry.getKey();
             if (key.endsWith(LOGGER_STDERR_LEVEL)) {
-                String loggerSymbol = key.substring(0, key.length() - LOGGER_STDERR_LEVEL.length());
-                String loggerName = symbolToName.get(loggerSymbol);
-                Logger logger = configuration.getLogger(loggerName);
+                Logger logger = configuration.getConfigLogger(key, LOGGER_STDERR_LEVEL, symbolToName);
                 if (logger == null) {
                     continue;
                 }
@@ -87,9 +92,7 @@ public class PropertiesConfiguration {
                 logger.config.stdErrLevel = Level.byName(value);
             }
             else if (key.endsWith(LOGGER_LEVEL)) {
-                String loggerSymbol = key.substring(0, key.length() - LOGGER_LEVEL.length());
-                String loggerName = symbolToName.get(loggerSymbol);
-                Logger logger = configuration.getLogger(loggerName);
+                Logger logger = configuration.getConfigLogger(key, LOGGER_LEVEL, symbolToName);
                 if (logger == null) {
                     continue;
                 }
@@ -101,31 +104,42 @@ public class PropertiesConfiguration {
                 logger.loggingLevel = Level.byName(value);
             }
             else if (key.endsWith(LOGGER_CONSOLE_ENABLED)) {
-                String loggerSymbol = key.substring(0, key.length() - LOGGER_CONSOLE_ENABLED.length());
-                String loggerName = symbolToName.get(loggerSymbol);
-                Logger logger = configuration.getLogger(loggerName);
+                Logger logger = configuration.getConfigLogger(key, LOGGER_CONSOLE_ENABLED, symbolToName);
                 if (logger == null) {
                     continue;
                 }
                 logger.config.writeToConsole = Boolean.parseBoolean(entry.getValue());
             }
             else if (key.endsWith(LOGGER_FILE_ENABLED)) {
-                String loggerSymbol = key.substring(0, key.length() - LOGGER_FILE_ENABLED.length());
-                String loggerName = symbolToName.get(loggerSymbol);
-                Logger logger = configuration.getLogger(loggerName);
+                Logger logger = configuration.getConfigLogger(key, LOGGER_FILE_ENABLED, symbolToName);
                 if (logger == null) {
                     continue;
                 }
                 logger.config.writeToFile = Boolean.parseBoolean(entry.getValue());
             }
             else if (key.endsWith(LOGGER_FILE)) {
-                String loggerSymbol = key.substring(0, key.length() - LOGGER_FILE.length());
-                String loggerName = symbolToName.get(loggerSymbol);
-                Logger logger = configuration.getLogger(loggerName);
+                Logger logger = configuration.getConfigLogger(key, LOGGER_FILE, symbolToName);
                 if (logger == null) {
                     continue;
                 }
-                logger.config.setOutput(new File(entry.getValue()));
+                File logFile = new File(entry.getValue());
+                logger.config.setOutput(logFile);
+            }
+            else if (key.endsWith(DATE_PATTERN)) {
+                Logger logger = configuration.getConfigLogger(key, DATE_PATTERN, symbolToName);
+                if (logger == null) {
+                    continue;
+                }
+                String pattern = entry.getValue();
+                logger.config.formatter = DateTimeFormatter.ofPattern(pattern).withZone(UTC0);
+            }
+            else if (key.endsWith(DATE_ZONE)) {
+                Logger logger = configuration.getConfigLogger(key, DATE_ZONE, symbolToName);
+                if (logger == null) {
+                    continue;
+                }
+                String zoneIdentifier = entry.getValue();
+                logger.config.formatter = logger.config.formatter.withZone(ZoneId.of(zoneIdentifier));
             }
         }
 
@@ -135,9 +149,7 @@ public class PropertiesConfiguration {
             if (!key.endsWith(LOGGER_INHERIT)) {
                 continue;
             }
-            String loggerSymbol = key.substring(0, key.length() - LOGGER_INHERIT.length());
-            String loggerName = symbolToName.get(loggerSymbol);
-            Logger toLogger = configuration.getLogger(loggerName);
+            Logger toLogger = configuration.getConfigLogger(key, LOGGER_INHERIT, symbolToName);
             if (toLogger == null) {
                 continue;
             }
@@ -150,6 +162,12 @@ public class PropertiesConfiguration {
 
         // System.out.println(properties);
         PropertiesConfiguration.config = configuration;
+    }
+
+    private Logger getConfigLogger(String key, String suffix, HashMap<String, String> symbolToName) {
+        String loggerSymbol = key.substring(0, key.length() - suffix.length());
+        String loggerName = symbolToName.get(loggerSymbol);
+        return this.getLogger(loggerName);
     }
 
     private Logger getLogger(String name) {
