@@ -2,14 +2,13 @@ package no4j.core;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 
 public class Logger {
     private final String name;
 
     private static final int STACK_INDEX = 3;
+    private static final Logger internalErrorLogger = new Logger("internal");
     private static final Logger globalLogger = new Logger("global");
 
     LoggerConfig config = LoggerConfig.create();
@@ -22,6 +21,17 @@ public class Logger {
         this.name = name;
     }
 
+    /**
+     * The logging framework logger. Can be turned off just like any other logger.
+     * Sometimes it's useful to know what causes errors internally
+     */
+    public static Logger getInternalErrorLogger() {
+        return internalErrorLogger;
+    }
+
+    /**
+     * Casual global logger
+     */
     public static Logger getGlobalLogger() {
         return globalLogger;
     }
@@ -117,7 +127,7 @@ public class Logger {
             }
         }
         String output = formatMessage(level, message, method);
-        if (config.writeToConsole) {
+        if (config.consoleOutputEnabled) {
             if (level.value > config.stdErrLevel.value) {
                 System.out.print(output);
             } else {
@@ -125,9 +135,12 @@ public class Logger {
             }
         }
 
-        if (config.writeToFile && config.fileOutput != null) {
+        if (config.fileOutputEnabled && config.fileAppender != null) {
             try {
-                Files.write(config.fileOutput, output.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+                byte[] bytes = output.getBytes(StandardCharsets.UTF_8);
+                synchronized (config.appenderLock) {
+                    config.fileAppender.logToFile(bytes);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 return;

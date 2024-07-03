@@ -1,14 +1,13 @@
 # No4J
 ##  Simple logging library with sane defaults
 ![Example logs](/img/logs.png)
-### Features:
+### Supports:
 
 - Level hierarchy, including custom levels
-- All loggers are OFF by default
-- Anonymous loggers, named loggers and a global logger
-- Output is directed to STDERR instead of STDOUT depending on severity
-- Output can be directed to files
-- Basic inheritance from another logger
+- Console output separation between STDERR and STDOUT depending on severity 
+- File output
+- Rolling appender with file compression
+- Basic inheritance
 
 ### Configuration
 - Create `no4j.properties` file in the root directory of the project or in `src/main/resources`
@@ -18,17 +17,17 @@
 - Inheritance occurs once all loggers are configured
 
 ### Configuration keys:
-| Key suffix         |                Meaning                 |    Default value    |       Type        |
-|:-------------------|:--------------------------------------:|:-------------------:|:-----------------:|
-| `.name`            |             _logger name_              |                     |      String       |
-| `.level`           |            _logging level_             |         OFF         |       Level       |
-| `.stderr.level`    |         _STDERR logging level_         |        ERROR        |       Level       |
-| `.file.out`        |            _log file path_             |        null         |       Path        |
-| `.file.enabled`    |            _write to file_             |        false        |      boolean      |
+|         Key suffix |                Meaning                 |    Default value    |       Type        |
+|-------------------:|:--------------------------------------:|:-------------------:|:-----------------:|
+|            `.name` |             _logger name_              |                     |      String       |
+|           `.level` |            _logging level_             |         OFF         |       Level       |
+|    `.stderr.level` |         _STDERR logging level_         |        ERROR        |       Level       |
+|        `.file.out` |            _log file path_             |        null         |       Path        |
+|    `.file.enabled` |            _write to file_             |        false        |      boolean      |
 | `.console.enabled` |           _write to console_           |        true         |      boolean      |
-| `.date.pattern`    |         _date format pattern_          | yyyy-MM-dd HH:mm:ss | DateTimeFormatter |
-| `.date.zone`       |           _UTC/GMT/UT zone_            |        UTC+0        |      ZoneId       |
-| `.inherit`         | _symbolic logger name to inherit from_ |         N/A         |        N/A        |
+|    `.date.pattern` |         _date format pattern_          | yyyy-MM-dd HH:mm:ss | DateTimeFormatter |
+|       `.date.zone` |           _UTC/GMT/UT zone_            |        UTC+0        |      ZoneId       |
+|         `.inherit` | _symbolic logger name to inherit from_ |         N/A         |        N/A        |
 
 
 ### Example properties

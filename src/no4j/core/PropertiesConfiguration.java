@@ -47,9 +47,16 @@ public class PropertiesConfiguration {
      * Initializes framework according to the properties file
      */
     public static void configure() throws IOException {
-        File file = new File(CONFIGURATION_FILENAME);
+        configure(CONFIGURATION_FILENAME);
+    }
+
+    /**
+     * Initializes framework according to the properties file denoted by given path argument
+     */
+    public static void configure(String propertiesPath) throws IOException {
+        File file = new File(propertiesPath);
         if (!file.exists()) {
-            file = new File("src/main/resources/" + CONFIGURATION_FILENAME);
+            file = new File("src/main/resources/" + propertiesPath);
         }
         if (!file.exists()) {
             System.err.println("Unable to locate no4j.properties");
@@ -108,14 +115,14 @@ public class PropertiesConfiguration {
                 if (logger == null) {
                     continue;
                 }
-                logger.config.writeToConsole = Boolean.parseBoolean(entry.getValue());
+                logger.config.consoleOutputEnabled = Boolean.parseBoolean(entry.getValue());
             }
             else if (key.endsWith(LOGGER_FILE_ENABLED)) {
                 Logger logger = configuration.getConfigLogger(key, LOGGER_FILE_ENABLED, symbolToName);
                 if (logger == null) {
                     continue;
                 }
-                logger.config.writeToFile = Boolean.parseBoolean(entry.getValue());
+                logger.config.fileOutputEnabled = Boolean.parseBoolean(entry.getValue());
             }
             else if (key.endsWith(LOGGER_FILE)) {
                 Logger logger = configuration.getConfigLogger(key, LOGGER_FILE, symbolToName);
@@ -205,5 +212,13 @@ public class PropertiesConfiguration {
     public static void reconfigure() throws IOException {
         Logger.getGlobalLogger().setLoggingLevel(Level.OFF);
         configure();
+    }
+
+    /**
+     * Resets framework and reconfigures according to the properties file denoted by given path argument
+     */
+    public static void reconfigure(String propertiesPath) throws IOException {
+        Logger.getGlobalLogger().setLoggingLevel(Level.OFF);
+        configure(propertiesPath);
     }
 }

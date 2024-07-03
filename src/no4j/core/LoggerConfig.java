@@ -1,6 +1,8 @@
 package no4j.core;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -9,17 +11,21 @@ public class LoggerConfig {
     /**
      * Whether to write to standard output - if set to false, disables printing. Enabled by default.
      */
-    volatile boolean writeToConsole = true;
+    volatile boolean consoleOutputEnabled = true;
 
     /**
      * Whether to write to file. Disabled by default.
      */
-    volatile boolean writeToFile = true;
+    volatile boolean fileOutputEnabled = true;
 
     /**
-     * Log file object to write logs to. Null by default.
+     * Lock for safe concurrent access and swap of the {@link FileAppender}
      */
-    volatile Path fileOutput = null;
+    final Object appenderLock = new Object();
+    /**
+     * FileAppender object. Null by default.
+     */
+    volatile FileAppender fileAppender = null;
 
     /**
      * Level at or below which to direct output to STDERR instead of STDOUT. Level.ERROR by default.
@@ -33,7 +39,7 @@ public class LoggerConfig {
 
     /**
      * The number of additional spaces counting from 0th character of the logging level's name
-     * to include in the formatted string. Minimum value: 4
+     * to include in the formatted string. Set with {@link #setLevelPadLength}. Minimum value: 4
      */
     volatile int levelPadLength = 14;
 
@@ -52,29 +58,38 @@ public class LoggerConfig {
     LoggerConfig() {
     }
 
-    public void writeToConsole(boolean enabled) {
-        writeToConsole = enabled;
+    public void enableConsoleOutput(boolean enabled) {
+        consoleOutputEnabled = enabled;
     }
 
-    public void writeToFile(boolean enabled) {
-        writeToFile = enabled;
+    public void enableFileOutput(boolean enabled) {
+        fileOutputEnabled = enabled;
     }
 
     public void includeMethod(boolean enabled) {
         includeMethod = enabled;
     }
 
-    public void setOutput(File logFile) {
+    public void setOutput(File logFile) throws IOException {
         if (logFile == null || logFile.isDirectory()) {
             return;
         }
-        fileOutput = logFile.toPath();
+        safelySwapAppender(new FileAppender(logFile.toPath()));
     }
-    public void setOutput(Path logFile) {
-        if (logFile == null) {
+    public void setOutput(Path logFile) throws IOException {
+        if (logFile == null || Files.isDirectory(logFile)) {
             return;
         }
-        fileOutput = logFile;
+        safelySwapAppender(new FileAppender(logFile));
+    }
+
+    private void safelySwapAppender(FileAppender newAppender) throws IOException {
+        synchronized (appenderLock) {
+            if (fileAppender != null) {
+                fileAppender.shutOff();
+            }
+            fileAppender = newAppender;
+        }
     }
 
     public void setLevelPadLength(int length) {
@@ -96,6 +111,14 @@ public class LoggerConfig {
         }
     }
 
+    public void setRolling(boolean enabled) {
+        this.fileAppender.enableRolling(enabled);
+    }
+
+    public void setRollingSize(long bytes) {
+        this.fileAppender.setMaxSize(bytes);
+    }
+
     public void setStdErrLevel(Level minLevel) {
         stdErrLevel = minLevel;
     }
@@ -106,9 +129,9 @@ public class LoggerConfig {
 
     public LoggerConfig copy() {
         LoggerConfig config = new LoggerConfig();
-        config.writeToFile = this.writeToFile;
-        config.writeToConsole = this.writeToConsole;
-        config.fileOutput = this.fileOutput;
+        config.fileOutputEnabled = this.fileOutputEnabled;
+        config.consoleOutputEnabled = this.consoleOutputEnabled;
+        config.fileAppender = this.fileAppender;
         config.stdErrLevel = this.stdErrLevel;
         config.includeMethod = this.includeMethod;
         return config;
@@ -117,9 +140,9 @@ public class LoggerConfig {
     @Override
     public String toString() {
         return "LoggerConfig{" +
-                "writeToConsole=" + writeToConsole +
-                ", writeToFile=" + writeToFile +
-                ", fileOutput=" + fileOutput +
+                "enableConsoleOutput=" + consoleOutputEnabled +
+                ", enableFileOutput=" + fileOutputEnabled +
+                ", fileOutput=" + fileAppender +
                 ", minStdErrLevel=" + stdErrLevel +
                 ", includeMethod=" + includeMethod +
                 '}';
