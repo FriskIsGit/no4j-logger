@@ -4,12 +4,20 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
+/**
+ * The central class used for logging
+ */
 public class Logger {
     private final String name;
 
     private static final int STACK_INDEX = 3;
-    private static final Logger internalErrorLogger = new Logger("internal");
+
     private static final Logger globalLogger = new Logger("global");
+    private static final Logger internalLogger;
+    static {
+        internalLogger = new Logger("internal");
+        internalLogger.setLoggingLevel(Level.ERROR);
+    }
 
     LoggerConfig config = LoggerConfig.create();
     /**
@@ -25,8 +33,8 @@ public class Logger {
      * The logging framework logger. Can be turned off just like any other logger.
      * Sometimes it's useful to know what causes errors internally
      */
-    public static Logger getInternalErrorLogger() {
-        return internalErrorLogger;
+    public static Logger getInternalLogger() {
+        return internalLogger;
     }
 
     /**
@@ -45,7 +53,7 @@ public class Logger {
 
     /**
      * Returns a valid logger as long as the name is not null.
-     * If a logger with given name is not found, a new logger is created and returned.
+     * If a logger with given name is not found, a new logger is created, stored in the list of loggers, then returned.
      */
     public static Logger getLogger(String name) {
         if (name == null) {
@@ -111,7 +119,7 @@ public class Logger {
     }
 
     public void exception(Throwable throwable) {
-        logMessage(throwable.getMessage(), Level.ERROR);
+        logMessage(throwable.toString(), Level.ERROR);
     }
 
     private void logMessage(String message, Level level) {
@@ -135,14 +143,12 @@ public class Logger {
             }
         }
 
-        if (config.fileOutputEnabled && config.fileAppender != null) {
+        if (config.fileOutputEnabled && config.fileAppender.isAttached()) {
             try {
                 byte[] bytes = output.getBytes(StandardCharsets.UTF_8);
-                synchronized (config.appenderLock) {
-                    config.fileAppender.logToFile(bytes);
-                }
+                config.fileAppender.logToFile(bytes);
             } catch (IOException e) {
-                e.printStackTrace();
+                internalLogger.exception(e);
                 return;
             }
         }
@@ -174,6 +180,10 @@ public class Logger {
         }
     }
 
+    /**
+     * All properties are inherited except the {@link FileAppender} as writing to the same file
+     * from different loggers could be undesired. Loggers are individually synchronized.
+     */
     public void inheritProperties(Logger logger) {
         this.loggingLevel = logger.loggingLevel;
         this.config = logger.config.copy();

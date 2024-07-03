@@ -19,13 +19,10 @@ public class LoggerConfig {
     volatile boolean fileOutputEnabled = true;
 
     /**
-     * Lock for safe concurrent access and swap of the {@link FileAppender}
+     * FileAppender object. One per logger.
+     * Lock on it for safe concurrent access.
      */
-    final Object appenderLock = new Object();
-    /**
-     * FileAppender object. Null by default.
-     */
-    volatile FileAppender fileAppender = null;
+    final FileAppender fileAppender = new FileAppender();
 
     /**
      * Level at or below which to direct output to STDERR instead of STDOUT. Level.ERROR by default.
@@ -70,27 +67,49 @@ public class LoggerConfig {
         includeMethod = enabled;
     }
 
+    /**
+     * Sets log file output using a {@link File} argument.
+     * The file given must not be null or a directory.
+     * This creates a new handle which can be released with {@link #detachOutput}
+     */
     public void setOutput(File logFile) throws IOException {
         if (logFile == null || logFile.isDirectory()) {
             return;
         }
-        safelySwapAppender(new FileAppender(logFile.toPath()));
+        try {
+            fileAppender.attach(logFile.toPath());
+        } catch (IOException e) {
+            Logger.getInternalLogger().exception(e);
+        }
     }
+
+    /**
+     * Sets log file output using a {@link Path} argument.
+     * The path given must not be null or represent a directory.
+     * This creates a new handle which can be released with {@link #detachOutput}
+     */
     public void setOutput(Path logFile) throws IOException {
         if (logFile == null || Files.isDirectory(logFile)) {
             return;
         }
-        safelySwapAppender(new FileAppender(logFile));
-    }
-
-    private void safelySwapAppender(FileAppender newAppender) throws IOException {
-        synchronized (appenderLock) {
-            if (fileAppender != null) {
-                fileAppender.shutOff();
-            }
-            fileAppender = newAppender;
+        try {
+            fileAppender.attach(logFile);
+        } catch (IOException e) {
+            Logger.getInternalLogger().exception(e);
         }
     }
+
+    /**
+     * Releases the file handle (the output stream)
+     */
+    public void detachOutput() throws IOException {
+        try {
+            fileAppender.detach();
+        } catch (IOException e) {
+            Logger.getInternalLogger().exception(e);
+        }
+    }
+
 
     public void setLevelPadLength(int length) {
         if (length < 4) {
@@ -129,11 +148,15 @@ public class LoggerConfig {
 
     public LoggerConfig copy() {
         LoggerConfig config = new LoggerConfig();
-        config.fileOutputEnabled = this.fileOutputEnabled;
-        config.consoleOutputEnabled = this.consoleOutputEnabled;
-        config.fileAppender = this.fileAppender;
-        config.stdErrLevel = this.stdErrLevel;
-        config.includeMethod = this.includeMethod;
+        config.consoleOutputEnabled = consoleOutputEnabled;
+        config.fileOutputEnabled = fileOutputEnabled;
+        config.formatter = formatter;
+        config.stdErrLevel = stdErrLevel;
+
+        config.includeMethod = includeMethod;
+        config.methodPadLength = methodPadLength;
+        config.levelPadLength = levelPadLength;
+
         return config;
     }
 

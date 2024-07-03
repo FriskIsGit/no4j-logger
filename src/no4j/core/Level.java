@@ -21,6 +21,7 @@ public class Level implements Serializable {
     public static final Level WARN = new Level(40, "WARN");
     public static final Level INFO = new Level(50, "INFO");
     public static final Level DEBUG = new Level(60, "DEBUG");
+
     public static final Level ALL = new Level(Integer.MAX_VALUE, "ALL");
 
     protected static final int OFF_VALUE = Level.OFF.value;

@@ -2,10 +2,7 @@ package no4j.core;
 
 import java.io.*;
 import java.nio.channels.Channels;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.nio.file.spi.FileSystemProvider;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -26,22 +23,19 @@ public class FileAppender {
             .withZone(ZoneId.systemDefault());
 
     private volatile Path outputPath;
-    private final OutputStream out;
+    private volatile OutputStream out;
     private final AtomicLong cursor = new AtomicLong(0);
 
+    private volatile boolean isAttached;
     private volatile boolean isRolling;
     private volatile long maxSize = DEFAULT_MAX_SIZE;
 
-    public FileAppender(Path path) throws IOException {
-        outputPath = path;
-        refreshCursor();
-        out = newFileStreamForWriting(outputPath);
-    }
+    public FileAppender() {}
 
     /**
      * Consistent with {@link Files#write} without additional fuss
      */
-    protected void logToFile(byte[] bytes) throws IOException {
+    public synchronized void logToFile(byte[] bytes) throws IOException {
         int len = bytes.length;
         int rem = len;
         while (rem > 0) {
@@ -54,7 +48,6 @@ public class FileAppender {
             roll();
         }
         out.flush();
-        // out.close();
     }
 
     private void refreshCursor() throws IOException {
@@ -65,6 +58,9 @@ public class FileAppender {
         }
     }
 
+    /**
+     * Consistent with {@link Files#newOutputStream} without additional fuss
+     */
     private static OutputStream newFileStreamForWriting(Path path) throws IOException {
         HashSet<StandardOpenOption> options = new HashSet<StandardOpenOption>(3) {{
             add(StandardOpenOption.CREATE);
@@ -83,6 +79,10 @@ public class FileAppender {
         return Channels.newInputStream(fsProvider.newByteChannel(path, options));
     }
 
+    public boolean isRolling() {
+        return isRolling;
+    }
+
     public void enableRolling(boolean enabled) {
         isRolling = enabled;
     }
@@ -91,13 +91,18 @@ public class FileAppender {
         maxSize = bytes;
     }
 
-    public void roll() throws IOException {
+    public synchronized void roll() throws IOException {
         String format = formatter.format(Instant.now());
         compressToGZip(outputPath, format + outputPath.getFileName() + ".zip");
         resetOutputFile();
         cursor.set(0);
     }
 
+    /**
+     * This method is responsible for compressing files into GZIPs.
+     * There's no exception associated with an already existing file that matches a newly compressed zip,
+     * the file will be overwritten.
+     */
     private static void compressToGZip(Path pathToCompress, String gZip) throws IOException {
         InputStream logStream = newFileStreamForReading(pathToCompress);
         GZIPOutputStream gZipOut = new GZIPOutputStream(newFileStreamForWriting(Paths.get(gZip)));
@@ -111,13 +116,26 @@ public class FileAppender {
         gZipOut.close();
     }
 
-    public void resetOutputFile() throws IOException {
+    private void resetOutputFile() throws IOException {
         RandomAccessFile file = new RandomAccessFile(outputPath.toFile(), "rw");
         file.setLength(0);
         file.close();
     }
 
-    public void shutOff() throws IOException {
+    public boolean isAttached() {
+        return isAttached;
+    }
+
+    public synchronized void attach(Path path) throws IOException {
+        outputPath = path;
+        refreshCursor();
+        out = newFileStreamForWriting(outputPath);
+        isAttached = true;
+    }
+
+    public synchronized void detach() throws IOException {
+        isAttached = false;
         out.close();
+        out = null;
     }
 }
