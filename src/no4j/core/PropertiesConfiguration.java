@@ -7,6 +7,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -20,8 +21,10 @@ public class PropertiesConfiguration {
     private static final String LOGGER_LEVEL = ".level"; // integer/level name
     private static final String LOGGER_CONSOLE_ENABLED = ".console.enabled"; // boolean
     private static final String LOGGER_FILE_ENABLED = ".file.enabled"; // boolean
-    private static final String LOGGER_STDERR_LEVEL = ".stderr.level"; // integer/level name
     private static final String LOGGER_FILE = ".file.out"; // file path
+    private static final String LOGGER_FILE_ROLLING_SIZE = ".file.rolling.size"; // size in bytes
+    private static final String LOGGER_FILE_ROLLING_ENABLED = ".file.rolling.enabled"; // boolean
+    private static final String LOGGER_STDERR_LEVEL = ".stderr.level"; // integer/level name
     private static final String DATE_PATTERN = ".date.pattern"; // date format pattern
     private static final String DATE_ZONE = ".date.zone"; // date zone (Instant requires zone)
 
@@ -31,7 +34,7 @@ public class PropertiesConfiguration {
 
     private static final ZoneId UTC0 = ZoneId.ofOffset("UTC", ZoneOffset.UTC);
 
-    ArrayList<Logger> loggers = new ArrayList<>();
+    List<Logger> loggers = Collections.synchronizedList(new ArrayList<>());
 
     /**
      * Returns the configuration singleton
@@ -130,7 +133,23 @@ public class PropertiesConfiguration {
                     continue;
                 }
                 File logFile = new File(entry.getValue());
-                logger.config.setOutput(logFile);
+                logger.setOutput(logFile);
+            }
+            else if (key.endsWith(LOGGER_FILE_ROLLING_SIZE)) {
+                Logger logger = configuration.getConfigLogger(key, LOGGER_FILE_ROLLING_SIZE, symbolToName);
+                if (logger == null) {
+                    continue;
+                }
+                long sizeInBytes = Long.parseLong(entry.getValue());
+                logger.fileAppender.setRollSize(sizeInBytes);
+            }
+            else if (key.endsWith(LOGGER_FILE_ROLLING_ENABLED)) {
+                Logger logger = configuration.getConfigLogger(key, LOGGER_FILE_ROLLING_ENABLED, symbolToName);
+                if (logger == null) {
+                    continue;
+                }
+                boolean isRolling = Boolean.parseBoolean(entry.getValue());
+                logger.fileAppender.setRolling(isRolling);
             }
             else if (key.endsWith(DATE_PATTERN)) {
                 Logger logger = configuration.getConfigLogger(key, DATE_PATTERN, symbolToName);
@@ -147,6 +166,8 @@ public class PropertiesConfiguration {
                 }
                 String zoneIdentifier = entry.getValue();
                 logger.config.formatter = logger.config.formatter.withZone(ZoneId.of(zoneIdentifier));
+            } else if (!key.endsWith(LOGGER_NAME) && !key.endsWith(LOGGER_INHERIT)) {
+                Logger.getInternalLogger().warn("Unrecognized key suffix in '" + key + '\'');
             }
         }
 

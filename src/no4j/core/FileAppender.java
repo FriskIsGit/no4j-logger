@@ -17,6 +17,7 @@ import java.util.zip.GZIPOutputStream;
  *
  */
 public class FileAppender {
+    private static final int MIN_SIZE = 1024;
     private static final int DEFAULT_MAX_SIZE = 4 * 1024 * 1024;
     private static final int BUFFER_SIZE = 8192;
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss_")
@@ -35,19 +36,24 @@ public class FileAppender {
     /**
      * Consistent with {@link Files#write} without additional fuss
      */
-    public synchronized void logToFile(byte[] bytes) throws IOException {
-        int len = bytes.length;
-        int rem = len;
-        while (rem > 0) {
-            int written = Math.min(rem, BUFFER_SIZE);
-            out.write(bytes, (len-rem), written);
-            cursor.addAndGet(written);
-            rem -= written;
+    public synchronized void logToFile(byte[] bytes) {
+        try {
+            int len = bytes.length;
+            int rem = len;
+            while (rem > 0) {
+                int written = Math.min(rem, BUFFER_SIZE);
+                out.write(bytes, (len-rem), written);
+                cursor.addAndGet(written);
+                rem -= written;
+            }
+            if (isRolling && cursor.get() >= maxSize) {
+                roll();
+            }
+            out.flush();
+        } catch (IOException e) {
+            Logger.getInternalLogger().exception(e);
+            isAttached = false;
         }
-        if (isRolling && cursor.get() >= maxSize) {
-            roll();
-        }
-        out.flush();
     }
 
     private void refreshCursor() throws IOException {
@@ -83,12 +89,12 @@ public class FileAppender {
         return isRolling;
     }
 
-    public void enableRolling(boolean enabled) {
+    public void setRolling(boolean enabled) {
         isRolling = enabled;
     }
 
-    public void setMaxSize(long bytes) {
-        maxSize = bytes;
+    public void setRollSize(long bytes) {
+        maxSize = Math.max(bytes, MIN_SIZE);
     }
 
     public synchronized void roll() throws IOException {
@@ -122,6 +128,9 @@ public class FileAppender {
         file.close();
     }
 
+    /**
+     * If during execution the handle is invalidated (the file is deleted or unhooked) it will automatically detach
+     */
     public boolean isAttached() {
         return isAttached;
     }
@@ -133,9 +142,26 @@ public class FileAppender {
         isAttached = true;
     }
 
+    public synchronized void reattach() throws IOException {
+        refreshCursor();
+        out = newFileStreamForWriting(outputPath);
+        isAttached = true;
+    }
+
+    /**
+     * Release file handle. Consecutive calls to this function have no effect
+     */
     public synchronized void detach() throws IOException {
+        if (!isAttached) {
+            return;
+        }
         isAttached = false;
         out.close();
         out = null;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        out.close();
     }
 }

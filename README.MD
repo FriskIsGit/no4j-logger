@@ -17,17 +17,19 @@
 - Inheritance occurs once all loggers are configured
 
 ### Configuration keys:
-|         Key suffix |                Meaning                 |    Default value    |       Type        |
-|-------------------:|:--------------------------------------:|:-------------------:|:-----------------:|
-|            `.name` |             _logger name_              |                     |      String       |
-|           `.level` |            _logging level_             |         OFF         |       Level       |
-|    `.stderr.level` |         _STDERR logging level_         |        ERROR        |       Level       |
-|        `.file.out` |            _log file path_             |        null         |       Path        |
-|    `.file.enabled` |            _write to file_             |        false        |      boolean      |
-| `.console.enabled` |           _write to console_           |        true         |      boolean      |
-|    `.date.pattern` |         _date format pattern_          | yyyy-MM-dd HH:mm:ss | DateTimeFormatter |
-|       `.date.zone` |           _UTC/GMT/UT zone_            |        UTC+0        |      ZoneId       |
-|         `.inherit` | _symbolic logger name to inherit from_ |         N/A         |        N/A        |
+|              Key suffix |                Meaning                 |    Default value    |       Type        |
+|------------------------:|:--------------------------------------:|:-------------------:|:-----------------:|
+|                 `.name` |             _logger name_              |                     |      String       |
+|                `.level` |            _logging level_             |         OFF         |       Level       |
+|         `.stderr.level` |         _STDERR logging level_         |        ERROR        |       Level       |
+|             `.file.out` |            _log file path_             |        null         |       Path        |
+|    `.file.rolling.size` |  _file size to reach before rolling_   |       4194304       |       Long        |
+|         `.file.enabled` |            _write to file_             |        false        |      boolean      |
+| `.file.rolling.enabled` |            _roll log files_            |        false        |      boolean      |
+|      `.console.enabled` |           _write to console_           |        true         |      boolean      |
+|         `.date.pattern` |         _date format pattern_          | yyyy-MM-dd HH:mm:ss | DateTimeFormatter |
+|            `.date.zone` |           _UTC/GMT/UT zone_            |        UTC+0        |      ZoneId       |
+|              `.inherit` | _symbolic logger name to inherit from_ |         N/A         |        N/A        |
 
 
 ### Example properties
@@ -37,6 +39,8 @@ main.package.level = ERROR
 main.package.date.zone = UTC+6
 main.package.file.out = main.package.log
 main.package.file.enabled = true
+main.package.file.rolling.size = 1048576
+main.package.file.rolling.enabled = false
 
 mongodb.name = org.nosql.impl
 mongodb.inherit = main.package
@@ -51,6 +55,32 @@ class Test {
         } catch (IOException e) {
             /* Handle exception */
         }
+    }
+}
+```
+
+### Configuring programmatically
+
+```java
+import no4j.core.Level;
+import no4j.core.Logger;
+
+class Test {
+    public static void main(String[] args) {
+        Logger log = Logger.getLogger("main.package");
+        log.setLoggingLevel(Level.ERROR);
+        log.setOutput("main.package.log");
+        log.getConfig().enableFileOutput(true);
+        log.getAppender().setRollSize(2 * 1024 * 1024);
+        log.getAppender().setRolling(true);
+        
+        // USAGE
+        log.debug("DEBUG");
+        log.info("INFO");
+        log.warn("WARNING");
+        log.fatal("FATAL");
+        log.unreachable("UNREACHABLE");
+        log.exception(new RuntimeException("Exception thrown!"));
     }
 }
 ```

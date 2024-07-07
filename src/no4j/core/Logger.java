@@ -1,7 +1,10 @@
 package no4j.core;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 
 /**
@@ -14,14 +17,22 @@ public class Logger {
 
     private static final Logger globalLogger = new Logger("global");
     private static final Logger internalLogger;
+
     static {
         internalLogger = new Logger("internal");
-        internalLogger.setLoggingLevel(Level.ERROR);
+        internalLogger.setLoggingLevel(Level.WARN);
+        internalLogger.config.methodPadLength = 80;
     }
 
-    LoggerConfig config = LoggerConfig.create();
     /**
-     * Logging level to apply when logging to standard out and the log file
+     * FileAppender object. One per logger.
+     */
+    final FileAppender fileAppender = new FileAppender();
+
+    LoggerConfig config = LoggerConfig.create();
+
+    /**
+     * Logging level to apply for logging to occur (applies to printing and file output)
      */
     Level loggingLevel = Level.OFF;
 
@@ -53,7 +64,8 @@ public class Logger {
 
     /**
      * Returns a valid logger as long as the name is not null.
-     * If a logger with given name is not found, a new logger is created, stored in the list of loggers, then returned.
+     * If logger with the given name is not found, a new logger is created, stored in the list of loggers, then returned.
+     * @return logger with the given name or <tt>null</tt>
      */
     public static Logger getLogger(String name) {
         if (name == null) {
@@ -68,6 +80,18 @@ public class Logger {
         Logger logger = new Logger(name);
         configuration.loggers.add(logger);
         return logger;
+    }
+
+    /**
+     * Removes a logger from the list of loggers.
+     * @return <tt>true</tt> if the list contained the specified logger, otherwise <tt>false</tt>.
+     */
+    public static boolean removeLogger(Logger logger) {
+        if (logger == null) {
+            return false;
+        }
+        PropertiesConfiguration configuration = PropertiesConfiguration.get();
+        return configuration.loggers.remove(logger);
     }
 
     public static int loggerCount() {
@@ -143,15 +167,61 @@ public class Logger {
             }
         }
 
-        if (config.fileOutputEnabled && config.fileAppender.isAttached()) {
-            try {
-                byte[] bytes = output.getBytes(StandardCharsets.UTF_8);
-                config.fileAppender.logToFile(bytes);
-            } catch (IOException e) {
-                internalLogger.exception(e);
-                return;
-            }
+        if (config.fileOutputEnabled && fileAppender.isAttached()) {
+            byte[] bytes = output.getBytes(StandardCharsets.UTF_8);
+            fileAppender.logToFile(bytes);
         }
+    }
+
+    /**
+     * Sets log file output using a {@link File} argument.
+     * The file given must not be null or a directory.
+     * This creates a new handle which can be released with {@link #detachOutput}
+     */
+    public void setOutput(File logFile) {
+        if (logFile == null || logFile.isDirectory()) {
+            return;
+        }
+        try {
+            fileAppender.attach(logFile.toPath());
+        } catch (IOException e) {
+            internalLogger.exception(e);
+        }
+    }
+
+    /**
+     * Sets log file output using a {@link Path} argument.
+     * The path given must not be null or represent a directory.
+     * This creates a new handle which can be released with {@link #detachOutput}
+     */
+    public void setOutput(Path logFile) {
+        if (logFile == null || Files.isDirectory(logFile)) {
+            return;
+        }
+        try {
+            fileAppender.attach(logFile);
+        } catch (IOException e) {
+            internalLogger.exception(e);
+        }
+    }
+
+    /**
+     * Releases the file handle (the output stream)
+     */
+    public void detachOutput() {
+        try {
+            fileAppender.detach();
+        } catch (IOException e) {
+            internalLogger.exception(e);
+        }
+    }
+
+    public boolean isAttached() {
+        return fileAppender.isAttached();
+    }
+
+    public FileAppender getAppender() {
+        return fileAppender;
     }
 
     public String formatMessage(Level level, String message, String method) {

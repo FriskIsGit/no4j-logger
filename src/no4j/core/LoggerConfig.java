@@ -1,9 +1,5 @@
 package no4j.core;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
@@ -17,12 +13,6 @@ public class LoggerConfig {
      * Whether to write to file. Disabled by default.
      */
     volatile boolean fileOutputEnabled = true;
-
-    /**
-     * FileAppender object. One per logger.
-     * Lock on it for safe concurrent access.
-     */
-    final FileAppender fileAppender = new FileAppender();
 
     /**
      * Level at or below which to direct output to STDERR instead of STDOUT. Level.ERROR by default.
@@ -67,50 +57,6 @@ public class LoggerConfig {
         includeMethod = enabled;
     }
 
-    /**
-     * Sets log file output using a {@link File} argument.
-     * The file given must not be null or a directory.
-     * This creates a new handle which can be released with {@link #detachOutput}
-     */
-    public void setOutput(File logFile) throws IOException {
-        if (logFile == null || logFile.isDirectory()) {
-            return;
-        }
-        try {
-            fileAppender.attach(logFile.toPath());
-        } catch (IOException e) {
-            Logger.getInternalLogger().exception(e);
-        }
-    }
-
-    /**
-     * Sets log file output using a {@link Path} argument.
-     * The path given must not be null or represent a directory.
-     * This creates a new handle which can be released with {@link #detachOutput}
-     */
-    public void setOutput(Path logFile) throws IOException {
-        if (logFile == null || Files.isDirectory(logFile)) {
-            return;
-        }
-        try {
-            fileAppender.attach(logFile);
-        } catch (IOException e) {
-            Logger.getInternalLogger().exception(e);
-        }
-    }
-
-    /**
-     * Releases the file handle (the output stream)
-     */
-    public void detachOutput() throws IOException {
-        try {
-            fileAppender.detach();
-        } catch (IOException e) {
-            Logger.getInternalLogger().exception(e);
-        }
-    }
-
-
     public void setLevelPadLength(int length) {
         if (length < 4) {
             length = 4;
@@ -128,14 +74,6 @@ public class LoggerConfig {
         if (formatter != null) {
             this.formatter = formatter;
         }
-    }
-
-    public void setRolling(boolean enabled) {
-        this.fileAppender.enableRolling(enabled);
-    }
-
-    public void setRollingSize(long bytes) {
-        this.fileAppender.setMaxSize(bytes);
     }
 
     public void setStdErrLevel(Level minLevel) {
@@ -158,16 +96,5 @@ public class LoggerConfig {
         config.levelPadLength = levelPadLength;
 
         return config;
-    }
-
-    @Override
-    public String toString() {
-        return "LoggerConfig{" +
-                "enableConsoleOutput=" + consoleOutputEnabled +
-                ", enableFileOutput=" + fileOutputEnabled +
-                ", fileOutput=" + fileAppender +
-                ", minStdErrLevel=" + stdErrLevel +
-                ", includeMethod=" + includeMethod +
-                '}';
     }
 }
