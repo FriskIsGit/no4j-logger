@@ -99,8 +99,9 @@ public class FileAppender {
     }
 
     public synchronized void roll() throws IOException {
-        String format = formatter.format(Instant.now());
-        compressToGZip(outputPath, format + outputPath.getFileName() + ".zip");
+        String timeFormat = formatter.format(Instant.now());
+        String gZipName = timeFormat + outputPath.getFileName() + ".zip";
+        compressToGZip(outputPath, outputPath.getParent().resolve(gZipName));
         resetOutputFile();
         cursor.set(0);
     }
@@ -110,9 +111,9 @@ public class FileAppender {
      * There's no exception associated with an already existing file that matches a newly compressed zip,
      * the file will be overwritten.
      */
-    private static void compressToGZip(Path pathToCompress, String gZip) throws IOException {
+    private static void compressToGZip(Path pathToCompress, Path gZip) throws IOException {
         InputStream logStream = newFileStreamForReading(pathToCompress);
-        GZIPOutputStream gZipOut = new GZIPOutputStream(newFileStreamForWriting(Paths.get(gZip)));
+        GZIPOutputStream gZipOut = new GZIPOutputStream(newFileStreamForWriting(gZip));
 
         byte[] buffer = new byte[BUFFER_SIZE];
         int bytesRead;
