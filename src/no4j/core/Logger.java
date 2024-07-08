@@ -161,6 +161,7 @@ public class Logger {
         String output = formatMessage(level, message, method);
         if (config.consoleOutputEnabled) {
             if (level.value > config.stdErrLevel.value) {
+                // TODO: Console.print
                 System.out.print(output);
             } else {
                 System.err.print(output);

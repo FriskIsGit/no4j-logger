@@ -23,6 +23,15 @@ public class FileAppender {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss_")
             .withZone(ZoneId.systemDefault());
 
+    private static final HashSet<StandardOpenOption> WRITE_OPTIONS = new HashSet<StandardOpenOption>(3) {{
+        add(StandardOpenOption.CREATE);
+        add(StandardOpenOption.APPEND);
+        add(StandardOpenOption.WRITE);
+    }};
+    private static final HashSet<StandardOpenOption> READ_OPTIONS = new HashSet<StandardOpenOption>(1) {{
+        add(StandardOpenOption.READ);
+    }};
+
     private volatile Path outputPath;
     private volatile OutputStream out;
     private final AtomicLong cursor = new AtomicLong(0);
@@ -68,21 +77,13 @@ public class FileAppender {
      * Consistent with {@link Files#newOutputStream} without additional fuss
      */
     private static OutputStream newFileStreamForWriting(Path path) throws IOException {
-        HashSet<StandardOpenOption> options = new HashSet<StandardOpenOption>(3) {{
-            add(StandardOpenOption.CREATE);
-            add(StandardOpenOption.APPEND);
-            add(StandardOpenOption.WRITE);
-        }};
         FileSystemProvider fsProvider = path.getFileSystem().provider();
-        return Channels.newOutputStream(fsProvider.newByteChannel(path, options));
+        return Channels.newOutputStream(fsProvider.newByteChannel(path, WRITE_OPTIONS));
     }
 
     private static InputStream newFileStreamForReading(Path path) throws IOException {
-        HashSet<StandardOpenOption> options = new HashSet<StandardOpenOption>(1) {{
-            add(StandardOpenOption.READ);
-        }};
         FileSystemProvider fsProvider = path.getFileSystem().provider();
-        return Channels.newInputStream(fsProvider.newByteChannel(path, options));
+        return Channels.newInputStream(fsProvider.newByteChannel(path, READ_OPTIONS));
     }
 
     public boolean isRolling() {
