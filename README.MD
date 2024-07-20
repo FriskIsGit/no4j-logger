@@ -23,7 +23,7 @@
 |                `.level` |            _logging level_             |         OFF         |       Level       |
 |         `.stderr.level` |         _STDERR logging level_         |        ERROR        |       Level       |
 |             `.file.out` |            _log file path_             |        null         |       Path        |
-|    `.file.rolling.size` |  _file size to reach before rolling_   |       4194304       |       Long        |
+    |    `.file.rolling.size` |  _file size to reach before rolling_   |       4194304       |       Long        |
 |         `.file.enabled` |            _write to file_             |        false        |      boolean      |
 | `.file.rolling.enabled` |            _roll log files_            |        false        |      boolean      |
 |      `.console.enabled` |           _write to console_           |        true         |      boolean      |
@@ -84,3 +84,20 @@ class Test {
     }
 }
 ```
+
+### ANSI color support
+**Generally supported within all Linux terminals**
+
+Windows `cmd` or `powershell` generally do not support ANSI.
+It is possible to enable ANSI in Windows 10 and later by creating a DWORD(32-bit) `VirtualTerminalLevel` with value `1` at `HKEY_CURRENT_USER\Console` in registry
+<br>
+
+**Alternative terminals for Windows that support ANSI**
+<ul>
+  <li>Git Bash</li>
+  <li>Cmder</li>
+  <li>IntelliJ console</li>
+</ul>
+
+
+

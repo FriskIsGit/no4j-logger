@@ -25,9 +25,14 @@ public class Logger {
     }
 
     /**
-     * FileAppender object. One per logger.
+     * <code>FileAppender</code> object. One per logger.
      */
     final FileAppender fileAppender = new FileAppender();
+
+    /**
+     * <code>Console</code> object. One per logger.
+     */
+    final Console console = Console.newDefault();
 
     LoggerConfig config = LoggerConfig.create();
 
@@ -161,10 +166,9 @@ public class Logger {
         String output = formatMessage(level, message, method);
         if (config.consoleOutputEnabled) {
             if (level.value > config.stdErrLevel.value) {
-                // TODO: Console.print
-                System.out.print(output);
+                console.outPrint(output, level);
             } else {
-                System.err.print(output);
+                console.errPrint(output, level);
             }
         }
 
@@ -223,6 +227,10 @@ public class Logger {
 
     public FileAppender getAppender() {
         return fileAppender;
+    }
+
+    public Console getConsole() {
+        return console;
     }
 
     public String formatMessage(Level level, String message, String method) {
