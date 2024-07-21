@@ -18,13 +18,13 @@ public class Console {
     private final PrintStream stdOut;
     private final PrintStream stdErr;
 
-    public Color unreachable = Color.of(Color.FG_BRIGHT_WHITE, Color.BG_BLACK);
-    public Color fatal = Color.fgUnderline(Color.FG_RED);
-    public Color error = Color.fg(Color.FG_BRIGHT_RED);
-    public Color warning = Color.fg(Color.FG_YELLOW);
-    public Color info = Color.fg(Color.FG_CYAN);
-    public Color debug = Color.fg(Color.FG_MAGENTA);
-    public Color custom = Color.fg(Color.FG_GREEN);
+    private Color unreachable = Color.of(Color.FG_BRIGHT_WHITE, Color.BG_BLACK);
+    private Color fatal = Color.fgUnderline(Color.FG_RED);
+    private Color error = Color.fg(Color.FG_BRIGHT_RED);
+    private Color warning = Color.fg(Color.FG_YELLOW);
+    private Color info = Color.fg(Color.FG_CYAN);
+    private Color debug = Color.fg(Color.FG_MAGENTA);
+    private Color custom = Color.fg(Color.FG_GREEN);
 
     private Console(PrintStream stdOut, PrintStream stdErr) {
         this.stdOut = stdOut;
@@ -79,30 +79,37 @@ public class Console {
     }
 
     public void setUnreachable(Color unreachable) {
+        if (unreachable == null) return;
         this.unreachable = unreachable;
     }
 
     public void setFatal(Color fatal) {
+        if (fatal == null) return;
         this.fatal = fatal;
     }
 
     public void setError(Color error) {
+        if (error == null) return;
         this.error = error;
     }
 
     public void setWarning(Color warning) {
+        if (warning == null) return;
         this.warning = warning;
     }
 
     public void setInfo(Color info) {
+        if (info == null) return;
         this.info = info;
     }
 
     public void setDebug(Color debug) {
+        if (debug == null) return;
         this.debug = debug;
     }
 
     public void setCustom(Color custom) {
+        if (custom == null) return;
         this.custom = custom;
     }
 

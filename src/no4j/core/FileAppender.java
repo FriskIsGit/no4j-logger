@@ -17,9 +17,10 @@ import java.util.zip.GZIPOutputStream;
  *
  */
 public class FileAppender {
-    private static final int MIN_SIZE = 1024;
-    private static final int DEFAULT_MAX_SIZE = 4 * 1024 * 1024;
+    private static final int MIN_ROLL_SIZE = 1024;
+    private static final int DEFAULT_ROLL_SIZE = 4 * 1024 * 1024;
     private static final int BUFFER_SIZE = 8192;
+
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss_")
             .withZone(ZoneId.systemDefault());
 
@@ -38,7 +39,7 @@ public class FileAppender {
 
     private volatile boolean isAttached;
     private volatile boolean isRolling;
-    private volatile long maxSize = DEFAULT_MAX_SIZE;
+    private volatile long rollSize = DEFAULT_ROLL_SIZE;
 
     public FileAppender() {}
 
@@ -55,7 +56,7 @@ public class FileAppender {
                 cursor.addAndGet(written);
                 rem -= written;
             }
-            if (isRolling && cursor.get() >= maxSize) {
+            if (isRolling && cursor.get() >= rollSize) {
                 roll();
             }
             out.flush();
@@ -95,7 +96,7 @@ public class FileAppender {
     }
 
     public void setRollSize(long bytes) {
-        maxSize = Math.max(bytes, MIN_SIZE);
+        rollSize = Math.max(bytes, MIN_ROLL_SIZE);
     }
 
     public synchronized void roll() throws IOException {
