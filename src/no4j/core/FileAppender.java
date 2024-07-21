@@ -138,6 +138,7 @@ public class FileAppender {
     }
 
     public synchronized void attach(Path path) throws IOException {
+        detach();
         outputPath = path;
         refreshCursor();
         out = newFileStreamForWriting(outputPath);

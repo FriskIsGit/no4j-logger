@@ -9,6 +9,7 @@
 - File output
 - Rolling appender with file compression
 - Basic inheritance
+- ANSI color printing
 
 ### Configuration
 - Create `no4j.properties` file in the root directory of the project or in `src/main/resources`
@@ -70,7 +71,7 @@ class Test {
     public static void main(String[] args) {
         Logger log = Logger.getLogger("main.package");
         log.setLoggingLevel(Level.ERROR);
-        log.setOutput("main.package.log");
+        log.setOutput(new File("main.package.log"));
         log.getConfig().enableFileOutput(true);
         log.getAppender().setRollSize(2 * 1024 * 1024);
         log.getAppender().setRolling(true);
