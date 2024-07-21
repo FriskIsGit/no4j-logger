@@ -1,5 +1,7 @@
 package no4j.core;
 
+import java.nio.file.Path;
+
 public class Color {
     private static final String ESC = "\033[";
 
@@ -56,6 +58,44 @@ public class Color {
 
     public static Color fgReverse(String fg) {
         return new Color(ESC + "7;" + fg + 'm');
+    }
+
+    /**
+     * Creates a color with RGB foreground and background. Leading `r` `g` `b` arguments define the foreground
+     */
+    public static Color rgb(int r, int g, int b, int r2, int g2, int b2) {
+        if (r < 0 || g < 0 || b < 0 || r2 < 0 || g2 < 0 || b2 < 0 ||
+                r > 255 || g > 255 || b > 255 || r2 > 255 || g2 > 255 || b2 > 255) {
+            return Color.RESET;
+        }
+        return new Color(
+                ESC + "38;2;" + r + ';' + g + ';' + b + 'm' + ESC + "48;2;" + r2 + ';' + g2 + ';' + b2 + 'm'
+        );
+    }
+
+    /**
+     * Shorthand for {@link Color#rgb(int, int, int, int, int, int)} where 3 values are merged into 1
+     * Creates a color with RGB foreground and background. Example argument: 255_255_255
+     */
+    public static Color rgb(int fgRGB, int bgRGB) {
+        int r = (fgRGB >> 2) & 0xFF;
+        int g = (fgRGB >> 1) & 0xFF;
+        int b = (fgRGB) & 0xFF;
+
+        int r2 = (bgRGB >> 2) & 0xFF;
+        int g2 = (bgRGB >> 1) & 0xFF;
+        int b2 = (bgRGB) & 0xFF;
+
+        return new Color(
+                ESC + "38;2;" + r + ';' + g + ';' + b + 'm' + ESC + "48;2;" + r2 + ';' + g2 + ';' + b2 + 'm'
+        );
+    }
+
+    public static Color rgbFg(int r, int g, int b) {
+        if (r < 0 || g < 0 || b < 0 || r > 255 || g > 255 || b > 255) {
+            return Color.RESET;
+        }
+        return new Color(ESC + "38;2;" + r + ';' + g + ';' + b + 'm');
     }
 
     private Color(String sgr) {

@@ -147,6 +147,10 @@ public class Logger {
         logMessage(message, Level.DEBUG);
     }
 
+    public void debug(Object object) {
+        logMessage(object.toString(), Level.DEBUG);
+    }
+
     public void exception(Throwable throwable) {
         logMessage(throwable.toString(), Level.ERROR);
     }
