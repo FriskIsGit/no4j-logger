@@ -1,6 +1,6 @@
 # No4J
 ##  Simple logging library with sane defaults
-![Example logs](/img/logs.png)
+![Example logs]
 ### Supports:
 
 - Level hierarchy, including custom levels
@@ -23,7 +23,7 @@
 |                `.level` |            _logging level_             |         OFF         |       Level       |
 |         `.stderr.level` |         _STDERR logging level_         |        ERROR        |       Level       |
 |             `.file.out` |            _log file path_             |        null         |       Path        |
-    |    `.file.rolling.size` |  _file size to reach before rolling_   |       4194304       |       Long        |
+|    `.file.rolling.size` |  _file size to reach before rolling_   |       4194304       |       Long        |
 |         `.file.enabled` |            _write to file_             |        false        |      boolean      |
 | `.file.rolling.enabled` |            _roll log files_            |        false        |      boolean      |
 |      `.console.enabled` |           _write to console_           |        true         |      boolean      |
