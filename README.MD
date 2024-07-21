@@ -1,6 +1,7 @@
 # No4J
 ##  Simple logging library with sane defaults
 ![Example logs](https://github.com/user-attachments/assets/404fba52-c025-461b-aefc-098c1c2709d5)
+![Colored logs](https://github.com/user-attachments/assets/75540660-dbdc-4eaa-8f04-bbafe344480c)
 ### Supports:
 
 - Level hierarchy, including custom levels
