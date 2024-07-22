@@ -113,6 +113,17 @@ public class Console {
         this.custom = custom;
     }
 
+    public void inheritColors(Console console) {
+        unreachable = console.unreachable;
+        fatal = console.fatal;
+        error = console.error;
+        warning = console.warning;
+        info = console.info;
+        debug = console.debug;
+        custom = console.custom;
+    }
+
+
     public void resetPrint() {
         System.out.print(Color.RESET);
     }

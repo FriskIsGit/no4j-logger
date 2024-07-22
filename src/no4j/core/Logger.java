@@ -270,6 +270,7 @@ public class Logger {
     public void inheritProperties(Logger logger) {
         this.loggingLevel = logger.loggingLevel;
         this.config = logger.config.copy();
+        this.console.inheritColors(logger.console);
     }
 
     @Override
