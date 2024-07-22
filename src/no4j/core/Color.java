@@ -69,7 +69,8 @@ public class Color {
             return Color.RESET;
         }
         return new Color(
-                ESC + "38;2;" + r + ';' + g + ';' + b + 'm' + ESC + "48;2;" + r2 + ';' + g2 + ';' + b2 + 'm'
+                ESC + "38;2;" + r + ';' + g + ';' + b + 'm' +
+                        ESC + "48;2;" + r2 + ';' + g2 + ';' + b2 + 'm'
         );
     }
 
@@ -78,16 +79,17 @@ public class Color {
      * Creates a color with RGB foreground and background. Example argument: 255_255_255
      */
     public static Color rgb(int fgRGB, int bgRGB) {
-        int r = (fgRGB >> 2) & 0xFF;
-        int g = (fgRGB >> 1) & 0xFF;
-        int b = (fgRGB) & 0xFF;
+        int r = (fgRGB >> 16) & 0xFF;
+        int g = (fgRGB >> 8) & 0xFF;
+        int b = fgRGB & 0xFF;
 
-        int r2 = (bgRGB >> 2) & 0xFF;
-        int g2 = (bgRGB >> 1) & 0xFF;
-        int b2 = (bgRGB) & 0xFF;
+        int r2 = (bgRGB >> 16) & 0xFF;
+        int g2 = (bgRGB >> 8) & 0xFF;
+        int b2 = bgRGB & 0xFF;
 
         return new Color(
-                ESC + "38;2;" + r + ';' + g + ';' + b + 'm' + ESC + "48;2;" + r2 + ';' + g2 + ';' + b2 + 'm'
+                ESC + "38;2;" + r + ';' + g + ';' + b + 'm' +
+                        ESC + "48;2;" + r2 + ';' + g2 + ';' + b2 + 'm'
         );
     }
 
