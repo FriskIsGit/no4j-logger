@@ -167,6 +167,9 @@ public class Logger {
                 method = stack[STACK_INDEX].toString();
             }
         }
+        if (message != null && message.length() > config.maxMessageLength) {
+            message = message.substring(0, config.maxMessageLength);
+        }
         String output = formatMessage(level, message, method);
         if (config.consoleOutputEnabled) {
             if (level.value > config.stdErrLevel.value) {

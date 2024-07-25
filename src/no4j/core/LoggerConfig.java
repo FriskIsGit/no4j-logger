@@ -5,6 +5,11 @@ import java.time.format.DateTimeFormatter;
 
 public class LoggerConfig {
     /**
+     * Maximum number of characters allowed in a message. Messages exceeding the limit are trimmed.
+     */
+    volatile int maxMessageLength = Integer.MAX_VALUE - 32;
+
+    /**
      * Whether to write to standard output - if set to false, disables printing. Enabled by default.
      */
     volatile boolean consoleOutputEnabled = true;
@@ -43,6 +48,12 @@ public class LoggerConfig {
             .withZone(ZoneId.systemDefault());
 
     LoggerConfig() {
+    }
+
+    public void setMaxMessageLength(int messageLength) {
+        if (messageLength < Integer.MAX_VALUE - 32) {
+            maxMessageLength = messageLength;
+        }
     }
 
     public void enableConsoleOutput(boolean enabled) {
@@ -86,6 +97,7 @@ public class LoggerConfig {
 
     public LoggerConfig copy() {
         LoggerConfig config = new LoggerConfig();
+        config.maxMessageLength = maxMessageLength;
         config.consoleOutputEnabled = consoleOutputEnabled;
         config.fileOutputEnabled = fileOutputEnabled;
         config.formatter = formatter;

@@ -19,6 +19,8 @@ public class PropertiesConfiguration {
     private static final String LOGGER_NAME = ".name"; // unique name
 
     private static final String LOGGER_LEVEL = ".level"; // integer/level name
+    private static final String LOGGER_MESSAGE_MAX_LEN = ".msg.length"; // integer value
+
     private static final String LOGGER_CONSOLE_ENABLED = ".console.enabled"; // boolean
     private static final String LOGGER_FILE_ENABLED = ".file.enabled"; // boolean
     private static final String LOGGER_FILE = ".file.out"; // file path
@@ -86,6 +88,7 @@ public class PropertiesConfiguration {
             }
         }
 
+        Logger internalLogger = Logger.getInternalLogger();
         // 2. Read logger configurations
         for(HashMap.Entry<String, String> entry : properties.entrySet()) {
             String key = entry.getKey();
@@ -95,11 +98,12 @@ public class PropertiesConfiguration {
                     continue;
                 }
                 String value = entry.getValue();
-                Level loggingLevel = Level.byName(value);
-                if (loggingLevel == null) {
+                Level stdErrLevel = Level.byName(value);
+                if (stdErrLevel == null) {
+                    internalLogger.error("The level '" + value + "' does not match any default logging levels.");
                     continue;
                 }
-                logger.config.stdErrLevel = Level.byName(value);
+                logger.config.stdErrLevel = stdErrLevel;
             }
             else if (key.endsWith(LOGGER_LEVEL)) {
                 Logger logger = configuration.getConfigLogger(key, LOGGER_LEVEL, symbolToName);
@@ -109,9 +113,18 @@ public class PropertiesConfiguration {
                 String value = entry.getValue();
                 Level loggingLevel = Level.byName(value);
                 if (loggingLevel == null) {
+                    internalLogger.error("The level '" + value + "' does not match any default logging levels.");
                     continue;
                 }
-                logger.loggingLevel = Level.byName(value);
+                logger.loggingLevel = loggingLevel;
+            }
+            else if (key.endsWith(LOGGER_MESSAGE_MAX_LEN)) {
+                Logger logger = configuration.getConfigLogger(key, LOGGER_MESSAGE_MAX_LEN, symbolToName);
+                if (logger == null) {
+                    continue;
+                }
+                String value = entry.getValue();
+                logger.config.maxMessageLength = Integer.parseInt(value);
             }
             else if (key.endsWith(LOGGER_CONSOLE_ENABLED)) {
                 Logger logger = configuration.getConfigLogger(key, LOGGER_CONSOLE_ENABLED, symbolToName);
@@ -167,7 +180,7 @@ public class PropertiesConfiguration {
                 String zoneIdentifier = entry.getValue();
                 logger.config.formatter = logger.config.formatter.withZone(ZoneId.of(zoneIdentifier));
             } else if (!key.endsWith(LOGGER_NAME) && !key.endsWith(LOGGER_INHERIT)) {
-                Logger.getInternalLogger().warn("Unrecognized key suffix in '" + key + '\'');
+                internalLogger.warn("Unrecognized key suffix in '" + key + '\'');
             }
         }
 

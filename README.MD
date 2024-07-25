@@ -19,19 +19,20 @@
 - Inheritance occurs once all loggers are configured
 
 ### Configuration keys:
-|              Key suffix |                Meaning                 |    Default value    |       Type        |
-|------------------------:|:--------------------------------------:|:-------------------:|:-----------------:|
-|                 `.name` |             _logger name_              |                     |      String       |
-|                `.level` |            _logging level_             |         OFF         |       Level       |
-|         `.stderr.level` |         _STDERR logging level_         |        ERROR        |       Level       |
-|             `.file.out` |            _log file path_             |        null         |       Path        |
-|    `.file.rolling.size` |  _file size to reach before rolling_   |       4194304       |       Long        |
-|         `.file.enabled` |            _write to file_             |        false        |      boolean      |
-| `.file.rolling.enabled` |            _roll log files_            |        false        |      boolean      |
-|      `.console.enabled` |           _write to console_           |        true         |      boolean      |
-|         `.date.pattern` |         _date format pattern_          | yyyy-MM-dd HH:mm:ss | DateTimeFormatter |
-|            `.date.zone` |           _UTC/GMT/UT zone_            |        UTC+0        |      ZoneId       |
-|              `.inherit` | _symbolic logger name to inherit from_ |         N/A         |        N/A        |
+|              Key suffix |                Meaning                 |     Default value      |       Type        |
+|------------------------:|:--------------------------------------:|:----------------------:|:-----------------:|
+|                 `.name` |             _logger name_              |                        |      String       |
+|                `.level` |            _logging level_             |          OFF           |       Level       |
+|           `.msg.length` |     _trimming length for messages_     | Integer.MAX_Value - 32 |        int        |
+|         `.stderr.level` |         _STDERR logging level_         |         ERROR          |       Level       |
+|             `.file.out` |            _log file path_             |          null          |       Path        |
+|    `.file.rolling.size` |  _file size to reach before rolling_   |        4194304         |       Long        |
+|         `.file.enabled` |            _write to file_             |         false          |      boolean      |
+| `.file.rolling.enabled` |            _roll log files_            |         false          |      boolean      |
+|      `.console.enabled` |           _write to console_           |          true          |      boolean      |
+|         `.date.pattern` |         _date format pattern_          |  yyyy-MM-dd HH:mm:ss   | DateTimeFormatter |
+|            `.date.zone` |           _UTC/GMT/UT zone_            |         UTC+0          |      ZoneId       |
+|              `.inherit` | _symbolic logger name to inherit from_ |          N/A           |        N/A        |
 
 
 ### Example properties
