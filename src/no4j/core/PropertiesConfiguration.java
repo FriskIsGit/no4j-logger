@@ -123,8 +123,8 @@ public class PropertiesConfiguration {
                 if (logger == null) {
                     continue;
                 }
-                String value = entry.getValue();
-                logger.config.maxMessageLength = Integer.parseInt(value);
+                int maxLength = Integer.parseInt(entry.getValue());
+                logger.config.setMaxMessageLength(maxLength);
             }
             else if (key.endsWith(LOGGER_CONSOLE_ENABLED)) {
                 Logger logger = configuration.getConfigLogger(key, LOGGER_CONSOLE_ENABLED, symbolToName);

@@ -51,7 +51,7 @@ public class LoggerConfig {
     }
 
     public void setMaxMessageLength(int messageLength) {
-        if (messageLength < Integer.MAX_VALUE - 32) {
+        if (0 <= messageLength && messageLength <= Integer.MAX_VALUE - 32) {
             maxMessageLength = messageLength;
         }
     }
