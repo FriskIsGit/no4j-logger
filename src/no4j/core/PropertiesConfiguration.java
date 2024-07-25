@@ -59,16 +59,18 @@ public class PropertiesConfiguration {
      * Initializes framework according to the properties file denoted by given path argument
      */
     public static void configure(String propertiesPath) throws IOException {
+        Logger internalLogger = Logger.getInternalLogger();
+
         File file = new File(propertiesPath);
         if (!file.exists()) {
             file = new File("src/main/resources/" + propertiesPath);
         }
         if (!file.exists()) {
-            System.err.println("Unable to locate no4j.properties");
+            internalLogger.error("Unable to locate no4j.properties");
             return;
         }
         if (!file.canRead()) {
-            System.err.println("Unable to read no4j.properties");
+            internalLogger.error("Unable to read no4j.properties");
             return;
         }
 
@@ -88,7 +90,6 @@ public class PropertiesConfiguration {
             }
         }
 
-        Logger internalLogger = Logger.getInternalLogger();
         // 2. Read logger configurations
         for(HashMap.Entry<String, String> entry : properties.entrySet()) {
             String key = entry.getKey();
@@ -123,8 +124,12 @@ public class PropertiesConfiguration {
                 if (logger == null) {
                     continue;
                 }
-                int maxLength = Integer.parseInt(entry.getValue());
-                logger.config.setMaxMessageLength(maxLength);
+                try {
+                    int maxLength = Integer.parseInt(entry.getValue());
+                    logger.config.setMaxMessageLength(maxLength);
+                } catch (NumberFormatException e) {
+                    internalLogger.exception(e);
+                }
             }
             else if (key.endsWith(LOGGER_CONSOLE_ENABLED)) {
                 Logger logger = configuration.getConfigLogger(key, LOGGER_CONSOLE_ENABLED, symbolToName);
@@ -153,8 +158,12 @@ public class PropertiesConfiguration {
                 if (logger == null) {
                     continue;
                 }
-                long sizeInBytes = Long.parseLong(entry.getValue());
-                logger.fileAppender.setRollSize(sizeInBytes);
+                try {
+                    long sizeInBytes = Long.parseLong(entry.getValue());
+                    logger.fileAppender.setRollSize(sizeInBytes);
+                } catch (NumberFormatException e) {
+                    internalLogger.exception(e);
+                }
             }
             else if (key.endsWith(LOGGER_FILE_ROLLING_ENABLED)) {
                 Logger logger = configuration.getConfigLogger(key, LOGGER_FILE_ROLLING_ENABLED, symbolToName);
