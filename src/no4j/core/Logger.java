@@ -119,6 +119,15 @@ public class Logger {
         return config;
     }
 
+    /**
+     * Attempts to log only if the supplied condition is true
+     */
+    public void logIf(boolean condition, String message, Level level) {
+        if (condition) {
+            logMessage(message, level);
+        }
+    }
+
     public void log(String message, Level level) {
         logMessage(message, level);
     }
