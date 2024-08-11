@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.Arrays;
 
 /**
  * The central class used for logging
@@ -164,6 +165,10 @@ public class Logger {
 
     public void debug(Object object) {
         logMessage(object.toString(), Level.DEBUG);
+    }
+
+    public <T> void debug(T[] array) {
+        logMessage(Arrays.toString(array), Level.DEBUG);
     }
 
     public void exception(Throwable throwable) {
