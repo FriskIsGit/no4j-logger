@@ -87,6 +87,12 @@ public class Logger {
         return logger;
     }
 
+    public static Logger getLoggerWithLevel(String name, Level level) {
+        Logger logger = getLogger(name);
+        logger.setLoggingLevel(level);
+        return logger;
+    }
+
     /**
      * Removes a logger from the list of loggers.
      * @return <tt>true</tt> if the list contained the specified logger, otherwise <tt>false</tt>.
