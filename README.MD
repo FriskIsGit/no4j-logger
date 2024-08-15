@@ -10,6 +10,7 @@
 - Rolling appender with file compression
 - Basic inheritance
 - ANSI color printing
+- Logging per site as an extension
 
 ### Configuration
 - Create `no4j.properties` file in the root directory of the project or in `src/main/resources`
