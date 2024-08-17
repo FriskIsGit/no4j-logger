@@ -61,7 +61,8 @@ public class LogSite {
     }
 
     /**
-     * Tracks invocations to permit only <code>n</code> number of calls after which the log site must be {@link LogSite#resetAtMost()}.
+     * Tracks invocations to permit only <code>n</code> number of calls after which the log site will return false
+     * indefinitely until the site is reset.
      * When <var>rateLimit</var> is set to <code>false</code> the call count is not affected.
      * @see     LogSite#atMostEvery(int, TimeUnit)
      * @param n the number of calls to skip before allowing the next call
@@ -79,7 +80,7 @@ public class LogSite {
      * It limits the frequency of calls allowing one call per <var>duration = n * unit</var>
      * @param n the minimum number of time units that must pass to permit the next call
      * @param unit the time unit
-     * @return true until the <code>n</code>th call occurs, false afterwards
+     * @return true if the duration elapsed since the previous call, otherwise false
      */
     public boolean atMostEvery(int n, TimeUnit unit) {
         if (!rateLimit) {
@@ -103,6 +104,10 @@ public class LogSite {
         rateLimit = enabled;
     }
 
+    /**
+     * Resets this log site, including all state related to:
+     * {@link LogSite#every}, {@link LogSite#atMost}, {@link LogSite#atMostEvery}
+     */
     public void reset() {
         firstCall = true;
         everyCalls = 0;
