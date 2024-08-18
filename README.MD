@@ -66,18 +66,19 @@ class Test {
 ### Configuring programmatically
 
 ```java
+import no4j.core.FileAppender;
 import no4j.core.Level;
 import no4j.core.Logger;
 
 class Test {
     public static void main(String[] args) {
-        Logger log = Logger.getLogger("main.package");
-        log.setLoggingLevel(Level.ERROR);
+        Logger log = Logger.getLoggerWithLevel("main.package", Level.ERROR);
         log.setOutput(new File("main.package.log"));
         log.getConfig().enableFileOutput(true);
-        log.getAppender().setRollSize(2 * 1024 * 1024);
-        log.getAppender().setRolling(true);
-        
+        FileAppender appender = log.getAppender();
+        appender.setRollSize(2 * 1024 * 1024);
+        appender.setRolling(true);
+
         // USAGE
         log.debug("DEBUG");
         log.info("INFO");
