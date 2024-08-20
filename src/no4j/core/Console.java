@@ -78,6 +78,10 @@ public class Console {
         useColor = enabled;
     }
 
+    public boolean isColorEnabled() {
+        return useColor;
+    }
+
     public void setUnreachable(Color unreachable) {
         if (unreachable == null) return;
         this.unreachable = unreachable;

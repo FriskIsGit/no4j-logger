@@ -76,8 +76,8 @@ public class LoggerConfig {
     }
 
     public void setMethodPadLength(int length) {
-        if (length < 23) {
-            length = 23;
+        if (length < 0) {
+            length = 0;
         }
         methodPadLength = length;
     }

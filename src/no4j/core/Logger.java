@@ -293,6 +293,7 @@ public class Logger {
     public void inheritProperties(Logger logger) {
         this.loggingLevel = logger.loggingLevel;
         this.config = logger.config.copy();
+        this.console.enableColor(logger.getConsole().isColorEnabled());
         this.console.inheritColors(logger.console);
     }
 
