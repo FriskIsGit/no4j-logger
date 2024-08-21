@@ -2,5 +2,15 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.no4j.logger</groupId>
     <artifactId>no4j-logger</artifactId>
-    <version>1</version>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
+
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+    </build>
 </project>
