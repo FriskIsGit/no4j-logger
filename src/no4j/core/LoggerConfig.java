@@ -4,6 +4,10 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 public class LoggerConfig {
+    public static final DateTimeFormatter FULL_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            .withZone(ZoneId.systemDefault());
+    public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss")
+            .withZone(ZoneId.systemDefault());
     /**
      * Maximum number of characters allowed in a message. Messages exceeding the limit are trimmed.
      */
@@ -44,8 +48,7 @@ public class LoggerConfig {
     /**
      * The date formatter to use for formatting the time of the log
      */
-    volatile DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-            .withZone(ZoneId.systemDefault());
+    volatile DateTimeFormatter formatter = FULL_DATE_FORMATTER;
 
     LoggerConfig() {
     }

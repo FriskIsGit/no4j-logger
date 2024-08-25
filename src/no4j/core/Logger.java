@@ -94,6 +94,17 @@ public class Logger {
         return logger;
     }
 
+    public static Logger getPrettyLogger(String name) {
+        Logger logger = getLoggerWithLevel(name, Level.INFO);
+        logger.getConsole().enableColor(true);
+        LoggerConfig config = logger.getConfig();
+        config.setFormatter(LoggerConfig.TIME_FORMATTER);
+        config.includeMethod(false);
+        config.setLevelPadLength(0);
+        config.setMethodPadLength(0);
+        return logger;
+    }
+
     /**
      * Removes a logger from the list of loggers.
      * @return <tt>true</tt> if the list contained the specified logger, otherwise <tt>false</tt>.
