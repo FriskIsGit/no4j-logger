@@ -149,6 +149,7 @@ public class LoggerBuilder {
 
     public LoggerBuilder customColor(Color custom) {
         console.setCustom(custom);
+        console.enableColor(true);
         return this;
     }
 
