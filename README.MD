@@ -74,15 +74,15 @@ class Test {
 import no4j.core.FileAppender;
 import no4j.core.Level;
 import no4j.core.Logger;
+import no4j.extensions.LoggerBuilder;
 
 class Test {
     public static void main(String[] args) {
-        Logger log = Logger.getLoggerWithLevel("main.package", Level.ERROR);
-        log.setOutput(new File("main.package.log"));
-        log.getConfig().enableFileOutput(true);
-        FileAppender appender = log.getAppender();
-        appender.setRollSize(2 * 1024 * 1024);
-        appender.setRolling(true);
+        Logger log = LoggerBuilder.error("main.package")
+                .file("main.package.log")
+                .rollAtMegabytes(2)
+                .maxMessageLength(5000)
+                .getLogger();
 
         // USAGE
         log.debug("DEBUG");
