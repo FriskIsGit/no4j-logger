@@ -1,7 +1,5 @@
 package no4j.core;
 
-import java.nio.file.Path;
-
 public class Color {
     private static final String ESC = "\033[";
 
@@ -17,13 +15,13 @@ public class Color {
     public static final String FG_WHITE   = "37";
 
     public static final String FG_BRIGHT_BLACK   = "90";
-    public static final String FG_BRIGHT_RED   = "91";
+    public static final String FG_BRIGHT_RED     = "91";
     public static final String FG_BRIGHT_GREEN   = "92";
-    public static final String FG_BRIGHT_YELLOW   = "93";
-    public static final String FG_BRIGHT_BLUE  = "94";
-    public static final String FG_BRIGHT_MAGENTA  = "95";
-    public static final String FG_BRIGHT_CYAN = "96";
-    public static final String FG_BRIGHT_WHITE = "97";
+    public static final String FG_BRIGHT_YELLOW  = "93";
+    public static final String FG_BRIGHT_BLUE    = "94";
+    public static final String FG_BRIGHT_MAGENTA = "95";
+    public static final String FG_BRIGHT_CYAN    = "96";
+    public static final String FG_BRIGHT_WHITE   = "97";
 
     public static final String BG_BLACK   = "40";
     public static final String BG_RED     = "41";

@@ -84,6 +84,7 @@ public class LoggerConfig {
         }
         methodPadLength = length;
     }
+
     public void setFormatter(DateTimeFormatter formatter) {
         if (formatter != null) {
             this.formatter = formatter;

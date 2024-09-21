@@ -14,7 +14,6 @@ import java.util.zip.GZIPOutputStream;
 /**
  * Responsible for writing to files, rolling behavior and compression.
  * This class uses a synchronized file output stream.
- *
  */
 public class FileAppender {
     private static final int MIN_ROLL_SIZE = 1024;
@@ -41,7 +40,8 @@ public class FileAppender {
     private volatile boolean isRolling;
     private volatile long rollSize = DEFAULT_ROLL_SIZE;
 
-    public FileAppender() {}
+    public FileAppender() {
+    }
 
     /**
      * Consistent with {@link Files#write} without additional fuss
@@ -52,7 +52,7 @@ public class FileAppender {
             int rem = len;
             while (rem > 0) {
                 int written = Math.min(rem, BUFFER_SIZE);
-                out.write(bytes, (len-rem), written);
+                out.write(bytes, len - rem, written);
                 cursor.addAndGet(written);
                 rem -= written;
             }

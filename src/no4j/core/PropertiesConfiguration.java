@@ -81,7 +81,7 @@ public class PropertiesConfiguration {
 
         HashMap<String, String> symbolToName = new HashMap<>();
         // 1. Create logger symbols
-        for(HashMap.Entry<String, String> entry : properties.entrySet()) {
+        for (HashMap.Entry<String, String> entry : properties.entrySet()) {
             String key = entry.getKey();
             if (key.endsWith(LOGGER_NAME)) {
                 String loggerSymbol = key.substring(0, key.length() - LOGGER_NAME.length());
@@ -92,7 +92,7 @@ public class PropertiesConfiguration {
         }
 
         // 2. Read logger configurations
-        for(HashMap.Entry<String, String> entry : properties.entrySet()) {
+        for (HashMap.Entry<String, String> entry : properties.entrySet()) {
             String key = entry.getKey();
             if (key.endsWith(LOGGER_STDERR_LEVEL)) {
                 Logger logger = configuration.getConfigLogger(key, LOGGER_STDERR_LEVEL, symbolToName);
@@ -106,8 +106,7 @@ public class PropertiesConfiguration {
                     continue;
                 }
                 logger.config.stdErrLevel = stdErrLevel;
-            }
-            else if (key.endsWith(LOGGER_LEVEL)) {
+            } else if (key.endsWith(LOGGER_LEVEL)) {
                 Logger logger = configuration.getConfigLogger(key, LOGGER_LEVEL, symbolToName);
                 if (logger == null) {
                     continue;
@@ -119,8 +118,7 @@ public class PropertiesConfiguration {
                     continue;
                 }
                 logger.loggingLevel = loggingLevel;
-            }
-            else if (key.endsWith(LOGGER_MESSAGE_MAX_LEN)) {
+            } else if (key.endsWith(LOGGER_MESSAGE_MAX_LEN)) {
                 Logger logger = configuration.getConfigLogger(key, LOGGER_MESSAGE_MAX_LEN, symbolToName);
                 if (logger == null) {
                     continue;
@@ -131,30 +129,26 @@ public class PropertiesConfiguration {
                 } catch (NumberFormatException e) {
                     internalLogger.exception(e);
                 }
-            }
-            else if (key.endsWith(LOGGER_CONSOLE_ENABLED)) {
+            } else if (key.endsWith(LOGGER_CONSOLE_ENABLED)) {
                 Logger logger = configuration.getConfigLogger(key, LOGGER_CONSOLE_ENABLED, symbolToName);
                 if (logger == null) {
                     continue;
                 }
                 logger.config.consoleOutputEnabled = Boolean.parseBoolean(entry.getValue());
-            }
-            else if (key.endsWith(LOGGER_FILE_ENABLED)) {
+            } else if (key.endsWith(LOGGER_FILE_ENABLED)) {
                 Logger logger = configuration.getConfigLogger(key, LOGGER_FILE_ENABLED, symbolToName);
                 if (logger == null) {
                     continue;
                 }
                 logger.config.fileOutputEnabled = Boolean.parseBoolean(entry.getValue());
-            }
-            else if (key.endsWith(LOGGER_FILE)) {
+            } else if (key.endsWith(LOGGER_FILE)) {
                 Logger logger = configuration.getConfigLogger(key, LOGGER_FILE, symbolToName);
                 if (logger == null) {
                     continue;
                 }
                 File logFile = new File(entry.getValue());
                 logger.setOutput(logFile);
-            }
-            else if (key.endsWith(LOGGER_FILE_ROLLING_SIZE)) {
+            } else if (key.endsWith(LOGGER_FILE_ROLLING_SIZE)) {
                 Logger logger = configuration.getConfigLogger(key, LOGGER_FILE_ROLLING_SIZE, symbolToName);
                 if (logger == null) {
                     continue;
@@ -165,24 +159,21 @@ public class PropertiesConfiguration {
                 } catch (NumberFormatException e) {
                     internalLogger.exception(e);
                 }
-            }
-            else if (key.endsWith(LOGGER_FILE_ROLLING_ENABLED)) {
+            } else if (key.endsWith(LOGGER_FILE_ROLLING_ENABLED)) {
                 Logger logger = configuration.getConfigLogger(key, LOGGER_FILE_ROLLING_ENABLED, symbolToName);
                 if (logger == null) {
                     continue;
                 }
                 boolean isRolling = Boolean.parseBoolean(entry.getValue());
                 logger.fileAppender.setRolling(isRolling);
-            }
-            else if (key.endsWith(DATE_PATTERN)) {
+            } else if (key.endsWith(DATE_PATTERN)) {
                 Logger logger = configuration.getConfigLogger(key, DATE_PATTERN, symbolToName);
                 if (logger == null) {
                     continue;
                 }
                 String pattern = entry.getValue();
                 logger.config.formatter = DateTimeFormatter.ofPattern(pattern).withZone(UTC0);
-            }
-            else if (key.endsWith(DATE_ZONE)) {
+            } else if (key.endsWith(DATE_ZONE)) {
                 Logger logger = configuration.getConfigLogger(key, DATE_ZONE, symbolToName);
                 if (logger == null) {
                     continue;
@@ -195,7 +186,7 @@ public class PropertiesConfiguration {
         }
 
         // 3. Inherit properties
-        for(HashMap.Entry<String, String> entry : properties.entrySet()) {
+        for (HashMap.Entry<String, String> entry : properties.entrySet()) {
             String key = entry.getKey();
             if (!key.endsWith(LOGGER_INHERIT)) {
                 continue;
@@ -222,7 +213,7 @@ public class PropertiesConfiguration {
     }
 
     private Logger getLogger(String name) {
-        for(Logger logger : loggers) {
+        for (Logger logger : loggers) {
             if (logger.getName().equals(name)) {
                 return logger;
             }

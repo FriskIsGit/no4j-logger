@@ -1,5 +1,6 @@
 package no4j.core;
 
+import java.io.OutputStream;
 import java.io.PrintStream;
 
 /**
@@ -15,8 +16,8 @@ import java.io.PrintStream;
 
 public class Console {
     private volatile boolean useColor = false;
-    private final PrintStream stdOut;
-    private final PrintStream stdErr;
+    private PrintStream stdOut;
+    private PrintStream stdErr;
 
     private Color unreachable = Color.of(Color.FG_BRIGHT_WHITE, Color.BG_BLACK);
     private Color fatal = Color.fgUnderline(Color.FG_RED);
@@ -29,6 +30,14 @@ public class Console {
     private Console(PrintStream stdOut, PrintStream stdErr) {
         this.stdOut = stdOut;
         this.stdErr = stdErr;
+    }
+
+    public void setStdOut(PrintStream out) {
+        stdOut = out;
+    }
+
+    public void setStdErr(PrintStream outErr) {
+        stdErr = outErr;
     }
 
     public static Console newDefault() {
@@ -126,7 +135,6 @@ public class Console {
         debug = console.debug;
         custom = console.custom;
     }
-
 
     public void resetPrint() {
         System.out.print(Color.RESET);

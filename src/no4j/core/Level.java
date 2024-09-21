@@ -98,6 +98,7 @@ public class Level implements Serializable {
                 return null;
         }
     }
+
     public static Level byName(String level) {
         switch (level.toUpperCase(Locale.ENGLISH)) {
             case "OFF":

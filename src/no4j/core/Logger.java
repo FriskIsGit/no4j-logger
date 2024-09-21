@@ -71,6 +71,7 @@ public class Logger {
     /**
      * Returns a valid logger as long as the name is not null.
      * If logger with the given name is not found, a new logger is created, stored in the list of loggers, then returned.
+     *
      * @return logger with the given name or <tt>null</tt>
      */
     public static Logger getLogger(String name) {
@@ -107,6 +108,7 @@ public class Logger {
 
     /**
      * Removes a logger from the list of loggers.
+     *
      * @return <tt>true</tt> if the list contained the specified logger, otherwise <tt>false</tt>.
      */
     public static boolean removeLogger(Logger logger) {

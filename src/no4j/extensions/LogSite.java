@@ -41,9 +41,10 @@ public class LogSite {
      * Tracks invocations to permit a call every <code>n</code>th time, the exception is the first call
      * which returns true.
      * When <var>rateLimit</var> is set to <code>false</code> the call count is not affected.
-     * @see     LogSite#atMost(int)
+     *
      * @param n number of calls to skip before allowing the next call
      * @return true if it's the <code>n</code>th call, false otherwise
+     * @see LogSite#atMost(int)
      */
     public boolean every(int n) {
         if (!rateLimit) {
@@ -64,9 +65,10 @@ public class LogSite {
      * Tracks invocations to permit only <code>n</code> number of calls after which the log site will return false
      * indefinitely until the site is reset.
      * When <var>rateLimit</var> is set to <code>false</code> the call count is not affected.
-     * @see     LogSite#atMostEvery(int, TimeUnit)
+     *
      * @param n the number of calls to skip before allowing the next call
      * @return true until the <code>n</code>th call occurs, false afterwards
+     * @see LogSite#atMostEvery(int, TimeUnit)
      */
     public boolean atMost(int n) {
         if (!rateLimit) {
@@ -78,7 +80,8 @@ public class LogSite {
     /**
      * Permits calls based on the time passed since the previous call.
      * It limits the frequency of calls allowing one call per <var>duration = n * unit</var>
-     * @param n the minimum number of time units that must pass to permit the next call
+     *
+     * @param n    the minimum number of time units that must pass to permit the next call
      * @param unit the time unit
      * @return true if the duration elapsed since the previous call, otherwise false
      */
@@ -96,9 +99,10 @@ public class LogSite {
 
     /**
      * When <var>rateLimit</var> is set to <code>false</code> every rate limiting method returns <code>true</code>
-     * @see     LogSite#every(int)
-     * @see     LogSite#atMost(int)
-     * @see     LogSite#atMostEvery(int, TimeUnit)
+     *
+     * @see LogSite#every(int)
+     * @see LogSite#atMost(int)
+     * @see LogSite#atMostEvery(int, TimeUnit)
      */
     public void enableRateLimit(boolean enabled) {
         rateLimit = enabled;
