@@ -78,7 +78,7 @@ public class Logger {
         if (name == null) {
             return null;
         }
-        PropertiesConfiguration configuration = PropertiesConfiguration.get();
+        No4JConfiguration configuration = No4JConfiguration.get();
         for (Logger logger : configuration.loggers) {
             if (logger.name.equals(name)) {
                 return logger;
@@ -115,12 +115,12 @@ public class Logger {
         if (logger == null) {
             return false;
         }
-        PropertiesConfiguration configuration = PropertiesConfiguration.get();
+        No4JConfiguration configuration = No4JConfiguration.get();
         return configuration.loggers.remove(logger);
     }
 
     public static int loggerCount() {
-        return PropertiesConfiguration.get().loggers.size();
+        return No4JConfiguration.get().loggers.size();
     }
 
     public String getName() {

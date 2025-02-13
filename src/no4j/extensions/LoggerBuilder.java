@@ -153,6 +153,11 @@ public class LoggerBuilder {
         return this;
     }
 
+    public LoggerBuilder consoleOutput(boolean enable) {
+        config.enableConsoleOutput(enable);
+        return this;
+    }
+
     public Logger getLogger() {
         return logger;
     }

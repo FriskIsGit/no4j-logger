@@ -15,52 +15,58 @@
 - ANSI color printing
 - Logging per site as an extension
 
-### Configuration
+### Configuration and properties
+The configuration file follows **INI** format:
+```ini
+[symbolic-name]
+name = org.some.package
+level = ERROR
+msg.length = 10000
+date.zone = UTC+6
+file.out = main.package.log
+file.enabled = true
+file.rolling.size=1048576
+file.rolling.enabled=false
 
-- Create `no4j.properties` file in the root directory of the project or in `src/main/resources`
-- Every key starts with a `symbolic logger name`, recognized only during configuration and ends in a `key suffix`
-- Every `key` is followed by `=` followed by `value`
-- The order of declarations or empty lines have no effect
-- Inheritance occurs once all loggers are configured
+[mongodb]
+name = org.nosql.impl
+inherit = main.package
+```
+
+Each logger declaration has its own symbolic name enclosed in square brackets.<br>
+Every `key` is followed by `=` followed by `value`. Two key-value pairs are not allowed on the same line. <br>
+Values are not enclosed in quotation marks. Comments are allowed but must be preceded with a `#`. <br>
+The order of declarations does not matter. Inheritance occurs once all loggers are configured, and it is performed in no particular order.
+The config file `no4j.ini` must be in the root directory of the project or in `src/main/resources`.
+Properties such as file output path are excluded from inheritance to prevent collisions.
 
 ### Configuration keys:
 
 |              Key suffix |                Meaning                 |     Default value      |       Type        |
 |------------------------:|:--------------------------------------:|:----------------------:|:-----------------:|
-|                 `.name` |             _logger name_              |                        |      String       |
-|                `.level` |            _logging level_             |          OFF           |       Level       |
-|           `.msg.length` |     _trimming length for messages_     | Integer.MAX_Value - 32 |        int        |
-|         `.stderr.level` |         _STDERR logging level_         |         ERROR          |       Level       |
-|             `.file.out` |            _log file path_             |          null          |       Path        |
-|    `.file.rolling.size` |  _file size to reach before rolling_   |        4194304         |       Long        |
-|         `.file.enabled` |            _write to file_             |         false          |      boolean      |
-| `.file.rolling.enabled` |            _roll log files_            |         false          |      boolean      |
-|      `.console.enabled` |           _write to console_           |          true          |      boolean      |
-|         `.date.pattern` |         _date format pattern_          |  yyyy-MM-dd HH:mm:ss   | DateTimeFormatter |
-|            `.date.zone` |           _UTC/GMT/UT zone_            |         UTC+0          |      ZoneId       |
-|              `.inherit` | _symbolic logger name to inherit from_ |          N/A           |        N/A        |
+|                  `name` |             _logger name_              |                        |      String       |
+|                 `level` |            _logging level_             |          OFF           |       Level       |
+|            `msg.length` |     _trimming length for messages_     | Integer.MAX_Value - 32 |        int        |
+|          `stderr.level` |         _STDERR logging level_         |         ERROR          |       Level       |
+|              `file.out` |            _log file path_             |          null          |       Path        |
+|     `file.rolling.size` |  _file size to reach before rolling_   |        4194304         |       Long        |
+|          `file.enabled` |            _write to file_             |         false          |      boolean      |
+|  `file.rolling.enabled` |            _roll log files_            |         false          |      boolean      |
+|       `console.enabled` |           _write to console_           |          true          |      boolean      |
+|          `date.pattern` |         _date format pattern_          |  yyyy-MM-dd HH:mm:ss   | DateTimeFormatter |
+|             `date.zone` |           _UTC/GMT/UT zone_            |         UTC+0          |      ZoneId       |
+|               `inherit` | _symbolic logger name to inherit from_ |          N/A           |        N/A        |
 
-### Example properties
 
-```properties
-main.package.name=org.some.package
-main.package.level=ERROR
-main.package.date.zone=UTC+6
-main.package.file.out=main.package.log
-main.package.file.enabled=true
-main.package.file.rolling.size=1048576
-main.package.file.rolling.enabled=false
-mongodb.name=org.nosql.impl
-mongodb.inherit=main.package
-```
-
-### Initialization - loading properties
+### Initializing by loading the configuration file
 
 ```java
+import no4j.core.No4JConfiguration;
+
 class Test {
     public static void main(String[] args) {
         try {
-            PropertiesConfiguration.configure();
+            No4JConfiguration.configure();
         } catch (IOException e) {
             /* Handle exception */
         }
