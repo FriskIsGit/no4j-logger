@@ -16,8 +16,8 @@ import java.io.PrintStream;
 
 public class Console {
     private volatile boolean useColor = false;
-    private PrintStream stdOut;
-    private PrintStream stdErr;
+    protected PrintStream stdOut;
+    protected PrintStream stdErr;
 
     private Color unreachable = Color.of(Color.FG_BRIGHT_WHITE, Color.BG_BLACK);
     private Color fatal = Color.fgUnderline(Color.FG_RED);
