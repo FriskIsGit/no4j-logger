@@ -102,7 +102,9 @@ public class FileAppender {
     public synchronized void roll() throws IOException {
         String timeFormat = formatter.format(Instant.now());
         String gZipName = timeFormat + outputPath.getFileName() + ".zip";
-        compressToGZip(outputPath, outputPath.getParent().resolve(gZipName));
+        Path parent = outputPath.getParent();
+        Path gZip = parent == null ? Paths.get(gZipName) : parent.resolve(gZipName);
+        compressToGZip(outputPath, gZip);
         resetOutputFile();
         cursor.set(0);
     }

@@ -96,6 +96,16 @@ public class LoggerBuilder {
         return this;
     }
 
+    public LoggerBuilder methodPadLength(int length) {
+        config.setMethodPadLength(length);
+        return this;
+    }
+
+    public LoggerBuilder levelPadLength(int length) {
+        config.setLevelPadLength(length);
+        return this;
+    }
+
     public LoggerBuilder formatter(DateTimeFormatter formatter) {
         config.setFormatter(formatter);
         return this;

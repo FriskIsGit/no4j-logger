@@ -96,10 +96,12 @@ public class Logger {
     }
 
     public static Logger getPrettyLogger(String name) {
-        Logger logger = getLoggerWithLevel(name, Level.INFO);
+        Logger logger = getLoggerWithLevel(name, Level.ALL);
         logger.getConsole().enableColor(true);
         LoggerConfig config = logger.getConfig();
-        config.setFormatter(LoggerConfig.TIME_FORMATTER);
+        if (config.formatter == LoggerConfig.FULL_DATE_FORMATTER) {
+            config.setFormatter(LoggerConfig.TIME_FORMATTER);
+        }
         config.includeMethod(false);
         config.setLevelPadLength(0);
         config.setMethodPadLength(0);
