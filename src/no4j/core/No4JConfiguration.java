@@ -17,15 +17,18 @@ public class No4JConfiguration {
 
     private static final String LOGGER_NAME = "name"; // unique name
     private static final String LOGGER_LEVEL = "level"; // integer/level name
-    private static final String LOGGER_MESSAGE_MAX_LEN = "msg.length"; // integer value
-    private static final String LOGGER_CONSOLE_ENABLED = "console.enabled"; // boolean
-    private static final String LOGGER_FILE_ENABLED = "file.enabled"; // boolean
-    private static final String LOGGER_FILE = "file.out"; // file path
-    private static final String LOGGER_FILE_ROLLING_SIZE = "file.rolling.size"; // size in bytes
-    private static final String LOGGER_FILE_ROLLING_ENABLED = "file.rolling.enabled"; // boolean
-    private static final String LOGGER_STDERR_LEVEL = "stderr.level"; // integer/level name
-    private static final String DATE_PATTERN = "date.pattern"; // date format pattern
-    private static final String DATE_ZONE = "date.zone"; // date zone (Instant requires zone)
+    private static final String LOGGER_MESSAGE_MAX_LEN = "msg_length"; // integer value
+    private static final String LOGGER_MESSAGE_METHOD = "msg_method"; // boolean
+    private static final String LOGGER_MESSAGE_LINE_NUMBER = "msg_line_number"; // boolean
+    private static final String LOGGER_MESSAGE_PACKAGE = "msg_package"; // boolean
+    private static final String LOGGER_CONSOLE_ENABLED = "console_enabled"; // boolean
+    private static final String LOGGER_FILE_ENABLED = "file_enabled"; // boolean
+    private static final String LOGGER_FILE = "file_out"; // file path
+    private static final String LOGGER_FILE_ROLLING_SIZE = "file_rolling_size"; // size in bytes
+    private static final String LOGGER_FILE_ROLLING_ENABLED = "file_rolling_enabled"; // boolean
+    private static final String LOGGER_STDERR_LEVEL = "stderr_level"; // integer/level name
+    private static final String DATE_PATTERN = "date_pattern"; // date format pattern
+    private static final String DATE_ZONE = "date_zone"; // date zone (Instant requires zone)
 
     private static final String LOGGER_INHERIT = "inherit"; // existing (symbolic) logger name
 
@@ -154,6 +157,15 @@ public class No4JConfiguration {
                     break;
                 case LOGGER_FILE_ENABLED:
                     logger.config.fileOutputEnabled = Boolean.parseBoolean(value);
+                    break;
+                case LOGGER_MESSAGE_METHOD:
+                    logger.config.includeMethod = Boolean.parseBoolean(value);
+                    break;
+                case LOGGER_MESSAGE_LINE_NUMBER:
+                    logger.config.includeLineNumber = Boolean.parseBoolean(value);
+                    break;
+                case LOGGER_MESSAGE_PACKAGE:
+                    logger.config.includePackage = Boolean.parseBoolean(value);
                     break;
                 case LOGGER_FILE:
                     File logFile = new File(value);

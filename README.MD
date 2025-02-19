@@ -21,12 +21,12 @@ The configuration file follows **INI** format:
 [symbolic-name]
 name = org.some.package
 level = ERROR
-msg.length = 10000
-date.zone = UTC+6
-file.out = main.package.log
-file.enabled = true
-file.rolling.size=1048576
-file.rolling.enabled=false
+msg_length = 10000
+date_zone = UTC+6
+file_out = main.package.log
+file_enabled = true
+file_rolling_size=1048576
+file_rolling_enabled=false
 
 [mongodb]
 name = org.nosql.impl
@@ -42,20 +42,23 @@ Properties such as file output path are excluded from inheritance to prevent col
 
 ### Configuration keys:
 
-|              Key suffix |                Meaning                 |     Default value      |       Type        |
-|------------------------:|:--------------------------------------:|:----------------------:|:-----------------:|
-|                  `name` |             _logger name_              |                        |      String       |
-|                 `level` |            _logging level_             |          OFF           |       Level       |
-|            `msg.length` |     _trimming length for messages_     | Integer.MAX_Value - 32 |        int        |
-|          `stderr.level` |         _STDERR logging level_         |         ERROR          |       Level       |
-|              `file.out` |            _log file path_             |          null          |       Path        |
-|     `file.rolling.size` |  _file size to reach before rolling_   |        4194304         |       Long        |
-|          `file.enabled` |            _write to file_             |         false          |      boolean      |
-|  `file.rolling.enabled` |            _roll log files_            |         false          |      boolean      |
-|       `console.enabled` |           _write to console_           |          true          |      boolean      |
-|          `date.pattern` |         _date format pattern_          |  yyyy-MM-dd HH:mm:ss   | DateTimeFormatter |
-|             `date.zone` |           _UTC/GMT/UT zone_            |         UTC+0          |      ZoneId       |
-|               `inherit` | _symbolic logger name to inherit from_ |          N/A           |        N/A        |
+| Key                    |                 Meaning                 |     Default value      |       Type        |
+|:-----------------------|:---------------------------------------:|:----------------------:|:-----------------:|
+| `name`                 |              _logger name_              |                        |      String       |
+| `level`                |             _logging level_             |          OFF           |       Level       |
+| `msg_length`           |        _cap log message length_         | Integer.MAX_Value - 32 |        int        |
+| `msg_method`           |     _include method in log message_     |          true          |      boolean      |
+| `msg_line_number`      |  _include line number in log message_   |          true          |      boolean      |
+| `msg_package`          | _include package prefix in log message_ |         false          |      boolean      |
+| `stderr_level`         |         _STDERR logging level_          |         ERROR          |       Level       |
+| `file_out`             |             _log file path_             |          null          |       Path        |
+| `file_rolling_size`    |   _file size to reach before rolling_   |        4194304         |       Long        |
+| `file_enabled`         |             _write to file_             |         false          |      boolean      |
+| `file_rolling_enabled` |            _roll log files_             |         false          |      boolean      |
+| `console_enabled`      |           _write to console_            |          true          |      boolean      |
+| `date_pattern`         |          _date format pattern_          |  yyyy-MM-dd HH:mm:ss   | DateTimeFormatter |
+| `date_zone`            |            _UTC/GMT/UT zone_            |         UTC+0          |      ZoneId       |
+| `inherit`              | _symbolic logger name to inherit from_  |          N/A           |        N/A        |
 
 
 ### Initializing by loading the configuration file

@@ -29,9 +29,19 @@ public class LoggerConfig {
     volatile Level stdErrLevel = Level.ERROR;
 
     /**
-     * Include method information where log was made. Enabled by default.
+     * Include method information where log was made (if available). Enabled by default.
      */
     volatile boolean includeMethod = true;
+
+    /**
+     * Include line number in method information (if available). Enabled by default.
+     */
+    volatile boolean includeLineNumber = true;
+
+    /**
+     * Include package prefix before class name in method information. Disabled by default.
+     */
+    volatile boolean includePackage = false;
 
     /**
      * The number of additional spaces counting from 0th character of the logging level's name

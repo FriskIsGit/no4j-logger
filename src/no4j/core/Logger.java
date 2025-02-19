@@ -213,7 +213,7 @@ public class Logger {
             // This is not guaranteed to work in which case method will be empty
             StackTraceElement[] stack = Thread.currentThread().getStackTrace();
             if (STACK_INDEX < stack.length) {
-                method = stack[STACK_INDEX].toString();
+                method = stackElementToMethod(stack[STACK_INDEX]);
             }
         }
         if (message != null && message.length() > config.maxMessageLength) {
@@ -221,6 +221,37 @@ public class Logger {
         }
         String output = formatMessage(level, message, method).toString();
         writeMessage(output, level);
+    }
+
+    // Based on the original StackTraceElement.toString()
+    private String stackElementToMethod(StackTraceElement el) {
+        StringBuilder format = new StringBuilder();
+
+        if (config.includePackage) {
+            format.append(el.getClassName());
+        } else {
+            String simpleClass = toSimpleClassName(el.getClassName());
+            format.append(simpleClass);
+        }
+        format.append('.');
+        format.append(el.getMethodName());
+
+        if (el.isNativeMethod()) {
+            format.append("(Native Method)");
+        } else {
+            String fileName = el.getFileName();
+            int lineNumber = el.getLineNumber();
+
+            format.append((fileName != null && lineNumber >= 0 && config.includeLineNumber) ?
+                    "(" + fileName + ":" + lineNumber + ")" :
+                    (fileName != null ?  "("+fileName+")" : "(Unknown Source)"));
+        }
+
+        return format.toString();
+    }
+
+    private static String toSimpleClassName(String fullClassName) {
+        return fullClassName.substring(fullClassName.lastIndexOf('.') + 1);
     }
 
     private void writeMessage(String message, Level level) {
