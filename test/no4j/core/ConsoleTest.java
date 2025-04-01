@@ -1,12 +1,11 @@
-import no4j.core.Color;
-import no4j.core.Console;
-import no4j.core.Level;
+package no4j.core;
+
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
 
+import static no4j.Mocks.mockStdout;
 import static org.junit.Assert.assertEquals;
 
 public class ConsoleTest {
@@ -90,12 +89,5 @@ public class ConsoleTest {
             System.out.println(actual);
         }
         assertEquals(cyanPurple + "Cyan and purple RGB" + Color.RESET, actual);
-    }
-
-    private static ByteArrayOutputStream mockStdout(Console console) {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        PrintStream outStream = new PrintStream(buffer);
-        console.setStdOut(outStream);
-        return buffer;
     }
 }

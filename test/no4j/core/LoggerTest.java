@@ -1,12 +1,11 @@
-import no4j.core.Console;
-import no4j.core.Level;
-import no4j.core.Logger;
-import no4j.core.LoggerConfig;
+package no4j.core;
+
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 
+import static no4j.Mocks.mockStderr;
+import static no4j.Mocks.mockStdout;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -36,7 +35,7 @@ public class LoggerTest {
         logger.error("e");
         logger.fatal("f");
         logger.unreachable("u");
-        assertEquals(0, buffer.toString().length());
+        assertEquals(0, buffer.size());
     }
 
     @Test
@@ -48,9 +47,9 @@ public class LoggerTest {
         logger.info("i");
         logger.warn("w");
         logger.error("e");
-        assertEquals(0, buffer.toString().length());
+        assertEquals(0, buffer.size());
         logger.fatal("f");
-        assertTrue(buffer.toString().length() > 0);
+        assertTrue(buffer.size() > 0);
     }
 
     @Test
@@ -67,6 +66,38 @@ public class LoggerTest {
         assertEquals(3, split.length);
     }
 
+    @Test
+    public void testStderrRedirectAtWarn() {
+        Logger logger = Logger.getLoggerWithLevel("test", Level.ALL);
+        logger.getConfig().setStdErrLevel(Level.WARN);
+        ByteArrayOutputStream outBuffer = mockStdout(logger);
+        ByteArrayOutputStream errBuffer = mockStderr(logger);
+
+        logger.info("i");
+        assertEquals(errBuffer.size(), 0);
+        int stdoutSize = outBuffer.size();
+        assertTrue(stdoutSize > 0);
+        logger.warn("w");
+        assertTrue(errBuffer.size() > 0);
+        // Also ensure STDOUT size hasn't changed
+        assertEquals(stdoutSize, outBuffer.size());
+    }
+
+    @Test
+    public void testStderrRedirectEverything() {
+        Logger logger = Logger.getLoggerWithLevel("test", Level.ALL);
+        logger.getConfig().setStdErrLevel(Level.ALL);
+        ByteArrayOutputStream outBuffer = mockStdout(logger);
+        ByteArrayOutputStream errBuffer = mockStderr(logger);
+
+        logger.debug("d");
+        logger.info("i");
+        logger.warn("w");
+        logger.fatal("f");
+        assertEquals(0, outBuffer.size());
+        assertTrue(errBuffer.size() > 0);
+    }
+
     private static Logger getSimpleTestLogger(Level level) {
         Logger logger = Logger.getLoggerWithLevel("test", level);
         LoggerConfig config = logger.getConfig();
@@ -75,13 +106,5 @@ public class LoggerTest {
         config.setLevelPadLength(0);
         config.setMethodPadLength(0);
         return logger;
-    }
-
-    private static ByteArrayOutputStream mockStdout(Logger logger) {
-        Console console = logger.getConsole();
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        PrintStream outStream = new PrintStream(buffer);
-        console.setStdOut(outStream);
-        return buffer;
     }
 }
