@@ -62,7 +62,7 @@ public class Logger {
     }
 
     /**
-     * Creates an anonymous logger. The newly created logger is not stored in the list of loggers.
+     * Creates an anonymous logger. The newly created logger is not stored in the list of loggers. Useful for testing.
      */
     public static Logger getAnonymousLogger() {
         return new Logger(null);
@@ -205,7 +205,7 @@ public class Logger {
     }
 
     private void logMessage(String message, Level level) {
-        if (this.loggingLevel.value == Level.OFF_VALUE || level == null || this.loggingLevel.value < level.value) {
+        if (level == null || level.value <= Level.OFF_VALUE || this.loggingLevel.value < level.value) {
             return;
         }
         String method = "";
@@ -373,8 +373,8 @@ public class Logger {
     public String toString() {
         return "Logger{" +
                 "name='" + name + '\'' +
-                ", config=" + config +
                 ", loggingLevel=" + loggingLevel +
+                ", config=" + config +
                 '}';
     }
 }

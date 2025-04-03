@@ -6,18 +6,13 @@ import java.io.ByteArrayOutputStream;
 
 import static no4j.Mocks.mockStderr;
 import static no4j.Mocks.mockStdout;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class LoggerTest {
-    @Test
-    public void testLoggersAreTheSame() {
-        assertEquals(Logger.getLogger("any"), Logger.getLogger("any"));
-    }
 
     @Test
     public void testMessageOutput() {
-        Logger logger = getSimpleTestLogger(Level.WARN);
+        Logger logger = getTestLogger(Level.WARN);
         ByteArrayOutputStream buffer = mockStdout(logger);
 
         logger.warn("TEST");
@@ -26,8 +21,9 @@ public class LoggerTest {
 
     @Test
     public void testNothingGetsLogged() {
-        Logger logger = getSimpleTestLogger(Level.OFF);
-        ByteArrayOutputStream buffer = mockStdout(logger);
+        Logger logger = getTestLogger(Level.OFF);
+        ByteArrayOutputStream outBuffer = mockStdout(logger);
+        ByteArrayOutputStream errBuffer = mockStderr(logger);
 
         logger.debug("d");
         logger.info("i");
@@ -35,12 +31,33 @@ public class LoggerTest {
         logger.error("e");
         logger.fatal("f");
         logger.unreachable("u");
-        assertEquals(0, buffer.size());
+        assertEquals(0, outBuffer.size());
+        assertEquals(0, errBuffer.size());
+    }
+
+    @Test
+    public void testNothingGetsLoggedAtOff() {
+        Logger logger = getTestLogger(Level.ALL);
+        ByteArrayOutputStream outBuffer = mockStdout(logger);
+        ByteArrayOutputStream errBuffer = mockStderr(logger);
+        logger.log("At 'OFF' nothing is logged", Level.OFF);
+        assertEquals(0, outBuffer.size());
+        assertEquals(0, errBuffer.size());
+    }
+
+    @Test
+    public void testNothingGetsLoggedAtNull() {
+        Logger logger = getTestLogger(Level.ALL);
+        ByteArrayOutputStream outBuffer = mockStdout(logger);
+        ByteArrayOutputStream errBuffer = mockStderr(logger);
+        logger.log("At 'null' nothing is logged", null);
+        assertEquals(0, outBuffer.size());
+        assertEquals(0, errBuffer.size());
     }
 
     @Test
     public void testLogFatal() {
-        Logger logger = getSimpleTestLogger(Level.FATAL);
+        Logger logger = getTestLogger(Level.FATAL);
         ByteArrayOutputStream buffer = mockStdout(logger);
 
         logger.debug("d");
@@ -54,7 +71,7 @@ public class LoggerTest {
 
     @Test
     public void testTimeFormatter() {
-        Logger logger = getSimpleTestLogger(Level.ALL);
+        Logger logger = getTestLogger(Level.ALL);
         logger.getConfig().setFormatter(LoggerConfig.TIME_FORMATTER);
         ByteArrayOutputStream buffer = mockStdout(logger);
 
@@ -68,7 +85,7 @@ public class LoggerTest {
 
     @Test
     public void testStderrRedirectAtWarn() {
-        Logger logger = Logger.getLoggerWithLevel("test", Level.ALL);
+        Logger logger = getTestLogger(Level.ALL);
         logger.getConfig().setStdErrLevel(Level.WARN);
         ByteArrayOutputStream outBuffer = mockStdout(logger);
         ByteArrayOutputStream errBuffer = mockStderr(logger);
@@ -85,7 +102,7 @@ public class LoggerTest {
 
     @Test
     public void testStderrRedirectEverything() {
-        Logger logger = Logger.getLoggerWithLevel("test", Level.ALL);
+        Logger logger = getTestLogger(Level.ALL);
         logger.getConfig().setStdErrLevel(Level.ALL);
         ByteArrayOutputStream outBuffer = mockStdout(logger);
         ByteArrayOutputStream errBuffer = mockStderr(logger);
@@ -98,8 +115,24 @@ public class LoggerTest {
         assertTrue(errBuffer.size() > 0);
     }
 
-    private static Logger getSimpleTestLogger(Level level) {
-        Logger logger = Logger.getLoggerWithLevel("test", level);
+    @Test
+    public void testLoggersAreTheSame() {
+        assertEquals(Logger.getLogger("same"), Logger.getLogger("same"));
+    }
+
+    @Test
+    public void testLoggerRetention() {
+        Logger previousLogger = Logger.getLogger("retention");
+        assertTrue(Logger.removeLogger(previousLogger));
+        Logger newLogger = Logger.getLogger("retention");
+        assertNotEquals(previousLogger, newLogger);
+        // Removing the previous logger should have no effect now
+        assertFalse(Logger.removeLogger(previousLogger));
+    }
+
+    private static Logger getTestLogger(Level level) {
+        Logger logger = Logger.getAnonymousLogger();
+        logger.setLoggingLevel(level);
         LoggerConfig config = logger.getConfig();
         config.setStdErrLevel(Level.OFF);
         config.includeMethod(false);
