@@ -39,16 +39,19 @@ public class LogSite {
 
     /**
      * Tracks invocations to permit a call every <code>n</code>th time, the exception is the first call
-     * which returns true.
+     * which returns true. These rules apply if n > 0, otherwise it returns false.
      * When <var>rateLimit</var> is set to <code>false</code> the call count is not affected.
      *
-     * @param n number of calls to skip before allowing the next call
+     * @param n the frequency of allowed calls, where <i>n-1</i> calls are skipped between each allowed call
      * @return true if it's the <code>n</code>th call, false otherwise
      * @see LogSite#atMost(int)
      */
     public boolean every(int n) {
         if (!rateLimit) {
             return true;
+        }
+        if (n <= 0) {
+            return false;
         }
         if (firstCall) {
             firstCall = false;
