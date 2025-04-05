@@ -2,7 +2,10 @@ package no4j.extensions;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.*;
 
 public class LogSiteTest {
     @Test
@@ -68,5 +71,40 @@ public class LogSiteTest {
             }
         }
         assertEquals(0, calls);
+    }
+
+    @Test
+    public void testAtMostEveryMillisecond() throws InterruptedException {
+        LogSite site = new LogSite();
+        int calls = 0;
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 10; i++) {
+            if (site.atMostEvery(1, TimeUnit.MILLISECONDS)) {
+                calls++;
+            }
+        }
+        long end = System.currentTimeMillis();
+        // This loop should have been executed under a millisecond. If not, the test is inconclusive.
+        if (end - start > 1) {
+            return;
+        }
+        CountDownLatch waiter = new CountDownLatch(1);
+        assertFalse(waiter.await(1, TimeUnit.MILLISECONDS));
+        if (site.atMostEvery(1, TimeUnit.MILLISECONDS)) {
+            calls++;
+        }
+        assertEquals(2, calls);
+    }
+
+    @Test
+    public void testAtMostNoTimeLimit() {
+        LogSite site = new LogSite();
+        int calls = 0;
+        for (int i = 0; i < 10; i++) {
+            if (site.atMostEvery(0, TimeUnit.HOURS)) {
+                calls++;
+            }
+        }
+        assertEquals(10, calls);
     }
 }
