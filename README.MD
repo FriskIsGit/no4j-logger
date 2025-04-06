@@ -42,23 +42,24 @@ Properties such as file output path are excluded from inheritance to prevent col
 
 ### Configuration keys:
 
-| Key                    |                 Meaning                 |     Default value      |       Type        |
-|:-----------------------|:---------------------------------------:|:----------------------:|:-----------------:|
-| `name`                 |              _logger name_              |                        |      String       |
-| `level`                |             _logging level_             |          OFF           |       Level       |
-| `msg_length`           |        _cap log message length_         | Integer.MAX_Value - 32 |        int        |
-| `msg_method`           |     _include method in log message_     |          true          |      boolean      |
-| `msg_line_number`      |  _include line number in log message_   |          true          |      boolean      |
-| `msg_package`          | _include package prefix in log message_ |         false          |      boolean      |
-| `stderr_level`         |         _STDERR logging level_          |         ERROR          |       Level       |
-| `file_out`             |             _log file path_             |          null          |       Path        |
-| `file_rolling_size`    |   _file size to reach before rolling_   |        4194304         |       Long        |
-| `file_enabled`         |             _write to file_             |         false          |      boolean      |
-| `file_rolling_enabled` |            _roll log files_             |         false          |      boolean      |
-| `console_enabled`      |           _write to console_            |          true          |      boolean      |
-| `date_pattern`         |          _date format pattern_          |  yyyy-MM-dd HH:mm:ss   | DateTimeFormatter |
-| `date_zone`            |            _UTC/GMT/UT zone_            |         UTC+0          |      ZoneId       |
-| `inherit`              | _symbolic logger name to inherit from_  |          N/A           |        N/A        |
+| Key                     |                 Meaning                 |     Default value      |       Type        |
+|:------------------------|:---------------------------------------:|:----------------------:|:-----------------:|
+| `name`                  |              _logger name_              |                        |      String       |
+| `level`                 |             _logging level_             |          OFF           |       Level       |
+| `msg_length`            |        _cap log message length_         | Integer.MAX_Value - 32 |        int        |
+| `msg_method`            |     _include method in log message_     |          true          |      boolean      |
+| `msg_line_number`       |  _include line number in log message_   |          true          |      boolean      |
+| `msg_package`           | _include package prefix in log message_ |         false          |      boolean      |
+| `msg_stack_trace_depth` | _max stack trace depth in log message_  |           64           |        int        |
+| `stderr_level`          |         _STDERR logging level_          |         ERROR          |       Level       |
+| `file_out`              |             _log file path_             |          null          |       Path        |
+| `file_rolling_size`     |   _file size to reach before rolling_   |        4194304         |       Long        |
+| `file_enabled`          |             _write to file_             |         false          |      boolean      |
+| `file_rolling_enabled`  |            _roll log files_             |         false          |      boolean      |
+| `console_enabled`       |           _write to console_            |          true          |      boolean      |
+| `date_pattern`          |          _date format pattern_          |  yyyy-MM-dd HH:mm:ss   | DateTimeFormatter |
+| `date_zone`             |            _UTC/GMT/UT zone_            |         UTC+0          |      ZoneId       |
+| `inherit`               | _symbolic logger name to inherit from_  |          N/A           |        N/A        |
 
 
 ### Initializing by loading the configuration file

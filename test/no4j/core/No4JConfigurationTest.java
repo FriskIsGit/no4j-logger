@@ -30,6 +30,7 @@ public class No4JConfigurationTest {
             assertFalse(config.includeMethod);
             assertFalse(config.includeLineNumber);
             assertTrue(config.includePackage);
+            assertEquals(50, config.maxStackTraceDepth);
             assertEquals(ZoneId.of("UTC-4"), config.formatter.getZone());
             assertFalse(config.fileOutputEnabled);
             assertEquals(4096, appender.getRollSize());

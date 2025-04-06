@@ -190,6 +190,9 @@ public class Logger {
         logMessage(throwable.toString(), Level.ERROR);
     }
 
+    /**
+     * Logs stack trace up to depth specified by {@link LoggerConfig#maxStackTraceDepth}
+     */
     public void stackTrace(String message, Throwable throwable) {
         if (this.loggingLevel.value < Level.ERROR_VALUE) {
             return;
@@ -200,7 +203,7 @@ public class Logger {
         StringBuilder format = formatMessage(Level.ERROR, message, firstMethod);
 
         int indent = format.length() - message.length() - config.methodPadLength;
-        appendRestOfStackTrace(stack, format, indent);
+        appendRestOfStackTrace(stack, format, indent, config.maxStackTraceDepth);
         writeMessage(format.toString(), Level.ERROR);
     }
 
@@ -350,8 +353,8 @@ public class Logger {
         }
     }
 
-    private static void appendRestOfStackTrace(StackTraceElement[] stack, StringBuilder format, int indent) {
-        for (int i = 1; i < stack.length; i++) {
+    private static void appendRestOfStackTrace(StackTraceElement[] stack, StringBuilder format, int indent, int maxDepth) {
+        for (int i = 1; i < stack.length && i< maxDepth; i++) {
             StackTraceElement element = stack[i];
             padWithSpaces(format, indent);
             format.append("at ").append(element.toString()).append("\n");

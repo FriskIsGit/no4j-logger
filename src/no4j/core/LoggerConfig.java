@@ -56,6 +56,11 @@ public class LoggerConfig {
     volatile int methodPadLength = 30;
 
     /**
+     * The maximum depth of the stack trace. If exceeded, the remaining levels will be suppressed.
+     */
+    volatile int maxStackTraceDepth = 64;
+
+    /**
      * The date formatter to use for formatting the time of the log
      */
     volatile DateTimeFormatter formatter = FULL_DATE_FORMATTER;
@@ -95,6 +100,13 @@ public class LoggerConfig {
         methodPadLength = length;
     }
 
+    public void setMaxStackTraceDepth(int maxDepth) {
+        if (maxDepth < 0) {
+            maxDepth = 0;
+        }
+        maxStackTraceDepth = maxDepth;
+    }
+
     public void setFormatter(DateTimeFormatter formatter) {
         if (formatter != null) {
             this.formatter = formatter;
@@ -122,6 +134,7 @@ public class LoggerConfig {
         config.includePackage = includePackage;
         config.methodPadLength = methodPadLength;
         config.levelPadLength = levelPadLength;
+        config.maxStackTraceDepth = maxStackTraceDepth;
 
         return config;
     }
