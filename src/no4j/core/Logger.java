@@ -22,7 +22,7 @@ public class Logger {
     static {
         internalLogger = new Logger("internal");
         internalLogger.setLoggingLevel(Level.WARN);
-        internalLogger.config.methodPadLength = 80;
+        internalLogger.config.methodPadLength = 64;
     }
 
     /**
@@ -365,6 +365,10 @@ public class Logger {
     public void inheritProperties(Logger logger) {
         this.loggingLevel = logger.loggingLevel;
         this.config = logger.config.copy();
+
+        this.fileAppender.setRolling(logger.fileAppender.isRolling());
+        this.fileAppender.setRollSize(logger.fileAppender.getRollSize());
+
         this.console.enableColor(logger.getConsole().isColorEnabled());
         this.console.inheritColors(logger.console);
     }

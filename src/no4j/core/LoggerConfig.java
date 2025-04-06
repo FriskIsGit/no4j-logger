@@ -117,7 +117,9 @@ public class LoggerConfig {
         config.formatter = formatter;
         config.stdErrLevel = stdErrLevel;
 
+        config.includeLineNumber = includeLineNumber;
         config.includeMethod = includeMethod;
+        config.includePackage = includePackage;
         config.methodPadLength = methodPadLength;
         config.levelPadLength = levelPadLength;
 

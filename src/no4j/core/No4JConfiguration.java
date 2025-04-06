@@ -223,19 +223,19 @@ public class No4JConfiguration {
             int lastIndex = line.length() - 1;
             if (line.charAt(0) == '[' && line.charAt(lastIndex) == ']') {
                 if (line.length() == 2) {
-                    internalLogger.error("Empty logger declaration symbol '[]' in line " + i);
+                    internalLogger.error("Empty logger declaration symbol '[]' (line " + (i+1) + ")");
                     continue;
                 }
                 currentSymbol = line.substring(1, lastIndex);
                 continue;
             }
             if (currentSymbol == null) {
-                internalLogger.warn("Untied declaration '" + line + "' (line " + i + ")");
+                internalLogger.warn("Untied declaration '" + line + "' (line " + (i+1) + ")");
                 continue;
             }
             int equal = line.indexOf('=');
             if (equal < 1 || equal + 1 >= line.length()) {
-                internalLogger.error("Invalid key=value pair '" + line + "' (line: " + i + ")");
+                internalLogger.error("Invalid key=value pair '" + line + "' (line: " + (i+1) + ")");
                 continue;
             }
             String propertyName = line.substring(0, equal).trim();

@@ -99,6 +99,10 @@ public class FileAppender {
         rollSize = Math.max(bytes, MIN_ROLL_SIZE);
     }
 
+    public long getRollSize() {
+        return rollSize;
+    }
+
     public synchronized void roll() throws IOException {
         String timeFormat = formatter.format(Instant.now());
         String gZipName = timeFormat + outputPath.getFileName() + ".zip";
