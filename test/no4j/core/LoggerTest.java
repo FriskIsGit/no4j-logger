@@ -20,6 +20,26 @@ public class LoggerTest {
     }
 
     @Test
+    public void testCustomLogOutput() {
+        Logger logger = getTestLogger(Level.ALL);
+        ByteArrayOutputStream buffer = mockStdout(logger);
+        Level db = Level.custom(1000, "database");
+        assertNotNull(db);
+
+        final String message = "SELECT * FROM users";
+        logger.log(message, db);
+        String expectedToContain = "[" + db.name + "] " + message;
+        assertTrue(buffer.toString().contains(expectedToContain));
+    }
+
+    @SuppressWarnings("all")
+    @Test
+    public void testGetNullLogger() {
+        Logger logger = Logger.getLogger(null);
+        assertNull(logger);
+    }
+
+    @Test
     public void testNothingGetsLogged() {
         Logger logger = getTestLogger(Level.OFF);
         ByteArrayOutputStream outBuffer = mockStdout(logger);
@@ -117,14 +137,16 @@ public class LoggerTest {
 
     @Test
     public void testLoggersAreTheSame() {
-        assertEquals(Logger.getLogger("same"), Logger.getLogger("same"));
+        final String name = "same";
+        assertEquals(Logger.getLogger(name), Logger.getLogger(name));
     }
 
     @Test
     public void testLoggerRetention() {
-        Logger previousLogger = Logger.getLogger("retention");
+        final String name = "retention";
+        Logger previousLogger = Logger.getLogger(name);
         assertTrue(Logger.removeLogger(previousLogger));
-        Logger newLogger = Logger.getLogger("retention");
+        Logger newLogger = Logger.getLogger(name);
         assertNotEquals(previousLogger, newLogger);
         // Removing the previous logger should have no effect now
         assertFalse(Logger.removeLogger(previousLogger));
