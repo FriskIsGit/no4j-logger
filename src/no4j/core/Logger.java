@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * The central class used for logging
@@ -79,13 +80,17 @@ public class Logger {
             return null;
         }
         No4JConfiguration configuration = No4JConfiguration.get();
-        for (Logger logger : configuration.loggers) {
-            if (logger.name.equals(name)) {
-                return logger;
+        List<Logger> loggers = configuration.loggers;
+        synchronized (loggers) {
+            for (Logger logger : loggers) {
+                if (logger.name.equals(name)) {
+                    return logger;
+                }
             }
         }
+
         Logger logger = new Logger(name);
-        configuration.loggers.add(logger);
+        loggers.add(logger);
         return logger;
     }
 

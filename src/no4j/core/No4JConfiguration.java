@@ -37,7 +37,7 @@ public class No4JConfiguration {
 
     private static final ZoneId UTC0 = ZoneId.ofOffset("UTC", ZoneOffset.UTC);
 
-    List<Logger> loggers = Collections.synchronizedList(new ArrayList<>());
+    final List<Logger> loggers = Collections.synchronizedList(new ArrayList<>());
 
     private No4JConfiguration() {}
 
@@ -207,6 +207,7 @@ public class No4JConfiguration {
         }
     }
 
+    // This method is only used internally during configuration, so it's single-threaded
     private Logger getLogger(String name) {
         for (Logger logger : loggers) {
             if (logger.getName().equals(name)) {
