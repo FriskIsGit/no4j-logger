@@ -18,7 +18,7 @@ import java.util.zip.GZIPOutputStream;
 public class FileAppender {
     private static final int MIN_ROLL_SIZE = 1024;
     private static final int DEFAULT_ROLL_SIZE = 4 * 1024 * 1024;
-    private static final int BUFFER_SIZE = 8192;
+    private static final int BUFFER_SIZE = 64 * 1024;
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss_")
             .withZone(ZoneId.systemDefault());
@@ -31,6 +31,11 @@ public class FileAppender {
     private static final HashSet<StandardOpenOption> READ_OPTIONS = new HashSet<StandardOpenOption>(1) {{
         add(StandardOpenOption.READ);
     }};
+
+    private ExceptionHandler handler = e -> {
+        Logger.getInternalLogger().exception(e);
+        isAttached = false;
+    };
 
     private volatile Path outputPath;
     private volatile OutputStream out;
@@ -61,8 +66,13 @@ public class FileAppender {
             }
             out.flush();
         } catch (IOException e) {
-            Logger.getInternalLogger().exception(e);
-            isAttached = false;
+            handler.handle(e);
+        }
+    }
+
+    public void setExceptionHandler(ExceptionHandler handler) {
+        if (handler != null) {
+            this.handler = handler;
         }
     }
 
