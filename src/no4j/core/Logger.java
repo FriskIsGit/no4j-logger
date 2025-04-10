@@ -38,6 +38,8 @@ public class Logger {
 
     LoggerConfig config = LoggerConfig.create();
 
+    ExceptionHandler handler = internalLogger::exception;
+
     /**
      * Logging level to apply for logging to occur (applies to printing and file output)
      */
@@ -212,6 +214,12 @@ public class Logger {
         writeMessage(format.toString(), Level.ERROR);
     }
 
+    public void setExceptionHandler(ExceptionHandler handler) {
+        if (handler != null) {
+            this.handler = handler;
+        }
+    }
+
     private void logMessage(String message, Level level) {
         if (level == null || level.value <= Level.OFF_VALUE || this.loggingLevel.value < level.value) {
             return;
@@ -289,7 +297,7 @@ public class Logger {
         try {
             fileAppender.attach(logFile.toPath());
         } catch (IOException e) {
-            internalLogger.exception(e);
+            handler.handle(e);
         }
     }
 
@@ -305,7 +313,7 @@ public class Logger {
         try {
             fileAppender.attach(logFile);
         } catch (IOException e) {
-            internalLogger.exception(e);
+            handler.handle(e);
         }
     }
 
@@ -316,7 +324,7 @@ public class Logger {
         try {
             fileAppender.detach();
         } catch (IOException e) {
-            internalLogger.exception(e);
+            handler.handle(e);
         }
     }
 
