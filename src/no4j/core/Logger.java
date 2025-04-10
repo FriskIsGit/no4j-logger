@@ -1,5 +1,7 @@
 package no4j.core;
 
+import no4j.extensions.LoggerBuilder;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -17,14 +19,10 @@ public class Logger {
 
     private static final int STACK_INDEX = 3;
 
+    private static final Logger internalLogger = LoggerBuilder.warning("internal")
+            .methodPadLength(64)
+            .getLogger();
     private static final Logger globalLogger = new Logger("global");
-    private static final Logger internalLogger;
-
-    static {
-        internalLogger = new Logger("internal");
-        internalLogger.setLoggingLevel(Level.WARN);
-        internalLogger.config.methodPadLength = 64;
-    }
 
     /**
      * <code>FileAppender</code> object. One per logger.
@@ -38,7 +36,7 @@ public class Logger {
 
     LoggerConfig config = LoggerConfig.create();
 
-    ExceptionHandler handler = internalLogger::exception;
+    ExceptionHandler handler = e -> Logger.getInternalLogger().exception(e);
 
     /**
      * Logging level to apply for logging to occur (applies to printing and file output)
@@ -385,7 +383,7 @@ public class Logger {
         this.fileAppender.setRolling(logger.fileAppender.isRolling());
         this.fileAppender.setRollSize(logger.fileAppender.getRollSize());
 
-        this.console.enableColor(logger.getConsole().isColorEnabled());
+        this.console.enableColor(logger.console.isColorEnabled());
         this.console.inheritColors(logger.console);
     }
 

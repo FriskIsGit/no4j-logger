@@ -22,6 +22,7 @@ public class No4JConfiguration {
     private static final String LOGGER_MESSAGE_LINE_NUMBER = "msg_line_number"; // boolean
     private static final String LOGGER_MESSAGE_PACKAGE = "msg_package"; // boolean
     private static final String LOGGER_MESSAGE_STACK_TRACE_DEPTH = "msg_stack_trace_depth"; // integer
+    private static final String LOGGER_CONSOLE_USE_COLOR = "console_use_color"; // boolean
     private static final String LOGGER_CONSOLE_ENABLED = "console_enabled"; // boolean
     private static final String LOGGER_FILE_ENABLED = "file_enabled"; // boolean
     private static final String LOGGER_FILE = "file_out"; // file path
@@ -127,7 +128,6 @@ public class No4JConfiguration {
 
     private static void configureLogger(Logger logger, HashMap<String, String> properties) {
         Logger internalLogger = Logger.getInternalLogger();
-
         for (HashMap.Entry<String, String> entry : properties.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
@@ -155,6 +155,9 @@ public class No4JConfiguration {
                     break;
                 case LOGGER_CONSOLE_ENABLED:
                     logger.config.consoleOutputEnabled = Boolean.parseBoolean(value);
+                    break;
+                case LOGGER_CONSOLE_USE_COLOR:
+                    logger.console.enableColor(Boolean.parseBoolean(value));
                     break;
                 case LOGGER_FILE_ENABLED:
                     logger.config.fileOutputEnabled = Boolean.parseBoolean(value);
