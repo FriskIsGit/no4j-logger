@@ -52,6 +52,9 @@ public class FileAppender {
      * Consistent with {@link Files#write} without additional fuss
      */
     public synchronized void logToFile(byte[] bytes) {
+        if (!isAttached) {
+            return;
+        }
         try {
             int len = bytes.length;
             int rem = len;
