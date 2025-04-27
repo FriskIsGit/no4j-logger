@@ -1,5 +1,16 @@
 package no4j.core;
 
+/**
+ * <code>Color</code> facilitates representing ANSI escape sequences as specified by the
+ * SGR - 'Select Graphic Rendition' standard. It is part of CSI - Control Sequence Introducer.
+ *
+ * <p>Colors are specified in the following format: <code>ESC[FG;BGm</code>
+ * <ul>
+ *   <li>FG - foreground string value in range 30-37</li>
+ *   <li>BG - background string value in range 40-47</li>
+ * </ul>
+ */
+
 public class Color {
     private static final String ESC = "\033[";
 

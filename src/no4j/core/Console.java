@@ -1,17 +1,10 @@
 package no4j.core;
 
-import java.io.OutputStream;
 import java.io.PrintStream;
 
 /**
- * The <code>Console</code> is a class capable of printing using ANSI colors as specified by the
- * SGR - 'Select Graphic Rendition' standard. It is part of CSI - Control Sequence Introducer.
- *
- * <p>Colors are specified in the following format: <code>ESC[FG;BGm</code>
- * <ul>
- *   <li>FG - foreground string value in range 30-37</li>
- *   <li>BG - background string value in range 40-47</li>
- * </ul>
+ * <code>Console</code> holds output streams and color configurations for each log level.
+ * The default sinks - STDOUT and STDERR can be changed which streamlines debugging or mocking.
  */
 
 public class Console {
@@ -44,42 +37,35 @@ public class Console {
         return new Console(System.out, System.err);
     }
 
-    public void outPrint(String msg, Level level) {
-        print(msg, level, stdOut);
+    public void outPrint(String text) {
+        print(text, stdOut);
     }
 
-    public void errPrint(String msg, Level level) {
-        print(msg, level, stdErr);
+    public void errPrint(String text) {
+        print(text, stdErr);
     }
 
-    void print(String msg, Level level, PrintStream stream) {
-        if (!useColor) {
-            stream.print(msg);
-            return;
-        }
+    void print(String text, PrintStream stream) {
+        stream.print(text);
+    }
+
+    public Color getColorByLevel(Level level) {
         switch (level.value) {
             case Level.UNREACHABLE_VALUE:
-                stream.print(unreachable + msg + Color.RESET);
-                break;
+                return unreachable;
             case Level.FATAL_VALUE:
-                stream.print(fatal + msg + Color.RESET);
-                break;
+                return fatal;
             case Level.ERROR_VALUE:
-                stream.print(error + msg + Color.RESET);
-                break;
+                return error;
             case Level.WARN_VALUE:
-                stream.print(warning + msg + Color.RESET);
-                break;
+                return warning;
             case Level.INFO_VALUE:
-                stream.print(info + msg + Color.RESET);
-                break;
+                return info;
             case Level.DEBUG_VALUE:
-                stream.print(debug + msg + Color.RESET);
-                break;
+                return debug;
             default:
                 // synonymous with CUSTOM
-                stream.print(custom + msg + Color.RESET);
-                break;
+                return custom;
         }
     }
 
@@ -137,6 +123,6 @@ public class Console {
     }
 
     public void resetPrint() {
-        System.out.print(Color.RESET);
+        stdOut.print(Color.RESET);
     }
 }

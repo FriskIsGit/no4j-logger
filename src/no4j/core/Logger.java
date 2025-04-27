@@ -202,14 +202,12 @@ public class Logger {
         if (this.loggingLevel.value < Level.ERROR_VALUE) {
             return;
         }
+        String time = config.formatter.format(Instant.now());
         StackTraceElement[] stack = throwable.getStackTrace();
         String firstMethod = stack.length > 0 ? stack[0].toString() : "";
 
-        StringBuilder format = formatMessage(Level.ERROR, message, firstMethod);
-
-        int indent = format.length() - message.length() - config.methodPadLength;
-        appendRestOfStackTrace(stack, format, indent, config.maxStackTraceDepth);
-        writeMessage(format.toString(), Level.ERROR);
+        LogMessage logMessage = new LogMessage(time, Level.ERROR, message, firstMethod, stack);
+        writeMessage(logMessage);
     }
 
     public void setExceptionHandler(ExceptionHandler handler) {
@@ -222,6 +220,7 @@ public class Logger {
         if (level == null || level.value <= Level.OFF_VALUE || this.loggingLevel.value < level.value) {
             return;
         }
+        Instant now = Instant.now();
         String method = "";
         if (config.includeMethod) {
             // This is not guaranteed to work in which case method will be empty
@@ -233,8 +232,69 @@ public class Logger {
         if (message != null && message.length() > config.maxMessageLength) {
             message = message.substring(0, config.maxMessageLength);
         }
-        String output = formatMessage(level, message, method).toString();
-        writeMessage(output, level);
+        String time = config.formatter.format(now);
+        LogMessage logMessage = new LogMessage(time, level, message, method);
+        writeMessage(logMessage);
+    }
+
+    public StringBuilder formatMessage(LogMessage msg, boolean applyColor) {
+        Level level = msg.level;
+        Color color = applyColor ? console.getColorByLevel(level) : null;
+        applyColor = color != null;
+
+        StringBuilder format = new StringBuilder(128);
+        String levelName = msg.level.toString();
+
+        format.append("[");
+        format.append(msg.time);
+        format.append("] ");
+
+        if (applyColor) {
+            format.append(color);
+        }
+        format.append("[");
+        format.append(levelName).append("] ");
+
+        int levelPadLen = config.levelPadLength - 1 - levelName.length();
+        padWithSpaces(format, levelPadLen);
+
+        int indent = format.length() - (applyColor ? color.sgr.length() : 0);
+
+        format.append(msg.method);
+        format.append(' ');
+        int methodPadLen = config.methodPadLength - 1 - msg.method.length();
+        padWithSpaces(format, methodPadLen);
+        format.append(msg.message);
+        if (applyColor) {
+            format.append(Color.RESET);
+        }
+        format.append('\n');
+        // Append stacktrace starting from index 1
+        if (msg.stack != null) {
+            if (applyColor) {
+                appendRestOfStackTrace(msg.stack, format, indent + 2, color);
+            } else {
+                appendRestOfStackTrace(msg.stack, format, indent + 2, null);
+            }
+        }
+
+        return format;
+    }
+
+    private void appendRestOfStackTrace(StackTraceElement[] stack, StringBuilder format, int indent, Color color) {
+        boolean applyColor = color != null;
+        for (int i = 1; i < stack.length && i < config.maxStackTraceDepth; i++) {
+            padWithSpaces(format, indent);
+            String element = stackElementToMethod(stack[i]);
+            if (applyColor) {
+                format.append(color);
+            }
+            format.append("at ").append(element);
+            if (applyColor) {
+                format.append(Color.RESET);
+            }
+            format.append('\n');
+        }
     }
 
     // Based on the original StackTraceElement.toString()
@@ -268,17 +328,20 @@ public class Logger {
         return fullClassName.substring(fullClassName.lastIndexOf('.') + 1);
     }
 
-    private void writeMessage(String message, Level level) {
+    private void writeMessage(LogMessage logMessage) {
         if (config.consoleOutputEnabled) {
-            if (level.value > config.stdErrLevel.value) {
-                console.outPrint(message, level);
+            String format = formatMessage(logMessage, console.isColorEnabled()).toString();
+            if (logMessage.level.value > config.stdErrLevel.value) {
+                console.outPrint(format);
             } else {
-                console.errPrint(message, level);
+                console.errPrint(format);
             }
         }
 
         if (config.fileOutputEnabled && fileAppender.isAttached()) {
-            byte[] bytes = message.getBytes(StandardCharsets.UTF_8);
+            StringBuilder format = formatMessage(logMessage, false);
+            // There's no way to get bytes from a StringBuilder directly
+            byte[] bytes = format.toString().getBytes(StandardCharsets.UTF_8);
             fileAppender.logToFile(bytes);
         }
     }
@@ -338,37 +401,9 @@ public class Logger {
         return console;
     }
 
-    public StringBuilder formatMessage(Level level, String message, String method) {
-        Instant instant = Instant.now();
-        StringBuilder format = new StringBuilder(128);
-        String levelName = level.toString();
-
-        String time = config.formatter.format(instant);
-        format.append(time);
-        format.append(' ');
-        format.append('[').append(levelName).append(']');
-        int levelPadLen = config.levelPadLength - levelName.length();
-        padWithSpaces(format, levelPadLen);
-        format.append(method);
-        format.append(' ');
-        int methodPadLen = config.methodPadLength - method.length();
-        padWithSpaces(format, methodPadLen);
-        format.append(message);
-        format.append('\n');
-        return format;
-    }
-
     private static void padWithSpaces(StringBuilder builder, int padLength) {
         for (int i = 0; i < padLength; i++) {
             builder.append(' ');
-        }
-    }
-
-    private static void appendRestOfStackTrace(StackTraceElement[] stack, StringBuilder format, int indent, int maxDepth) {
-        for (int i = 1; i < stack.length && i< maxDepth; i++) {
-            StackTraceElement element = stack[i];
-            padWithSpaces(format, indent);
-            format.append("at ").append(element.toString()).append("\n");
         }
     }
 

@@ -127,6 +127,11 @@ public class LoggerBuilder {
         return this;
     }
 
+    public LoggerBuilder withColor() {
+        console.enableColor(true);
+        return this;
+    }
+
     public LoggerBuilder fatalColor(Color color) {
         console.setFatal(color);
         console.enableColor(true);
