@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,6 +34,11 @@ public class Logger {
      * <code>Console</code> object. One per logger.
      */
     final Console console = Console.newDefault();
+
+    /**
+     * <code>Appender</code> objects. Many per logger.
+     */
+    final List<Appender> appenders = new ArrayList<>();
 
     LoggerConfig config = LoggerConfig.create();
 
@@ -344,6 +350,10 @@ public class Logger {
             byte[] bytes = format.toString().getBytes(StandardCharsets.UTF_8);
             fileAppender.logToFile(bytes);
         }
+
+        for (Appender appender : appenders) {
+            appender.log(logMessage);
+        }
     }
 
     /**
@@ -395,6 +405,10 @@ public class Logger {
 
     public FileAppender getAppender() {
         return fileAppender;
+    }
+
+    public void addAppender(Appender appender) {
+        appenders.add(appender);
     }
 
     public Console getConsole() {

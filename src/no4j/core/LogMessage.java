@@ -23,4 +23,51 @@ public class LogMessage implements Serializable {
         this.method = method;
         this.stack = stack;
     }
+
+    public String toJson() {
+        return "{" +
+                "\"time\":\"" + jsonEncode(time) + '\"' +
+                ",\"level\":\"" + jsonEncode(level.name) + '\"' +
+                ",\"message\":\"" + jsonEncode(message) + '\"' +
+                ",\"method\":\"" + jsonEncode(method) + '\"' +
+                '}';
+    }
+
+    protected static String jsonEncode(String str) {
+        if (str == null) {
+            return null;
+        }
+        StringBuilder escaped = new StringBuilder();
+        for (char c : str.toCharArray()) {
+            switch (c) {
+                case '"':
+                    escaped.append("\\\"");
+                    break;
+                case '\\':
+                    escaped.append("\\\\");
+                    break;
+                case '/':
+                    escaped.append("\\/");
+                    break;
+                case '\b':
+                    escaped.append("\\b");
+                    break;
+                case '\f':
+                    escaped.append("\\f");
+                    break;
+                case '\n':
+                    escaped.append("\\n");
+                    break;
+                case '\r':
+                    escaped.append("\\r");
+                    break;
+                case '\t':
+                    escaped.append("\\t");
+                    break;
+                default:
+                    escaped.append(c);
+            }
+        }
+        return escaped.toString();
+    }
 }
