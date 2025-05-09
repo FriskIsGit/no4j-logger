@@ -2,8 +2,7 @@ package no4j.core;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 public class AppenderTest {
 
@@ -28,5 +27,23 @@ public class AppenderTest {
         logger.addAppender(appender);
         logger.fatal("Don't emit that");
         assertFalse(emitted[0]);
+    }
+
+    @Test
+    public void testManyAppenders() {
+        Logger logger = Logger.getLoggerWithLevel("many-emit", Level.INFO);
+
+        final int[] emitted = new int[3];
+        Appender appender1 = newMessage -> emitted[0]++;
+        Appender appender2 = newMessage -> emitted[1]++;
+        Appender appender3 = newMessage -> emitted[2]++;
+        logger.addAppender(appender1);
+        logger.addAppender(appender2);
+        logger.addAppender(appender3);
+        logger.info("Three emits");
+        logger.info("Six emits");
+        assertEquals(2, emitted[0]);
+        assertEquals(2, emitted[1]);
+        assertEquals(2, emitted[2]);
     }
 }

@@ -107,4 +107,20 @@ public class LogSiteTest {
         }
         assertEquals(10, calls);
     }
+
+    @Test
+    public void testEveryAndAtMost() {
+        LogSite site = new LogSite();
+        int calls = 0;
+        final int every = 3, atMost = 5;
+        int iterations = 13;
+        int expectedCalls = Math.min(atMost, (int)Math.ceil((double) iterations /every));
+        for (int i = 0; i < iterations; i++) {
+            // C s s C s s C s s C s s C
+            if (site.every(every) && site.atMost(atMost)) {
+                calls++;
+            }
+        }
+        assertEquals(expectedCalls, calls);
+    }
 }
