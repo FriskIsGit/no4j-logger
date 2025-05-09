@@ -106,8 +106,13 @@ public class Logger {
         return logger;
     }
 
+    /**
+     * Calls {@link Logger#getLogger}.
+     * Then modifies it by enabling colored logging, reducing padding to 0 and shortening date format.
+     * @return logger with the given name or <tt>null</tt>
+     */
     public static Logger getPrettyLogger(String name) {
-        Logger logger = getLoggerWithLevel(name, Level.ALL);
+        Logger logger = getLogger(name);
         logger.getConsole().enableColor(true);
         LoggerConfig config = logger.getConfig();
         if (config.formatter == LoggerConfig.FULL_DATE_FORMATTER) {
